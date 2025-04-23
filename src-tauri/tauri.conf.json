@@ -39,11 +39,6 @@
         "release": "1"
       }
     },
-    "macOS": {
-      "dmg": {
-        "background": "./images/"
-      }
-    },
     "windows": {
       "nsis": {
         "installMode": "perMachine"

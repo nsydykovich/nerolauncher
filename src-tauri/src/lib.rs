@@ -13,6 +13,7 @@ pub fn run() {
                 .set_focus();
         }))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_prevent_default::init())
         .invoke_handler(tauri::generate_handler![greet]);
 
     builder
