@@ -1,0 +1,98 @@
+{
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "appearance": "Appearance",
+    "java": "Java",
+    "minecraft": "Minecraft",
+    "language": "Language",
+    "system": "System"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Customize the look and feel of Nero Launcher.",
+    "tabs": {
+      "theme": "Theme",
+      "colorMode": "Color Mode",
+      "colorScheme": "Color Scheme"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Choose a visual theme for the launcher",
+      "builtin": "Built-in",
+      "yourThemes": "Your themes",
+      "saveCurrent": "Save current",
+      "import": "Import",
+      "customSplit": "Custom…",
+      "customSplitTitle": "Custom split variants",
+      "lightMode": "Light mode",
+      "darkMode": "Dark mode",
+      "apply": "Apply",
+      "saveTheme": "Save Theme",
+      "themeName": "Theme name…",
+      "cancel": "Cancel",
+      "save": "Save",
+      "export": "Export",
+      "delete": "Delete",
+      "replaceConfirm": "A theme named \"{name}\" already exists. Replace it?",
+      "deleteConfirm": "Delete theme \"{name}\"?",
+      "importError": "Failed to import theme: invalid file format",
+      "accentColor": "Accent Color",
+      "accentDefault": "Default"
+    },
+    "colorMode": {
+      "title": "Color Mode",
+      "description": "Choose between light, dark or follow the system setting",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "colorScheme": {
+      "title": "Color Scheme",
+      "description": "Customize the visual appearance and feel",
+      "blur": "Backdrop Blur",
+      "blurDesc": "Apply blur effect to glass-style elements",
+      "density": "UI Density",
+      "compact": "Compact",
+      "normal": "Normal",
+      "comfortable": "Comfortable",
+      "fontFamily": "Font Family",
+      "fontSize": "Font Size",
+      "scale": "UI Scale"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "description": "Choose the display language for the launcher",
+    "select": "Select Language",
+    "en": "English",
+    "ru": "Русский"
+  },
+  "system": {
+    "title": "System",
+    "minimizeToTray": "Minimize to Tray",
+    "minimizeToTrayDesc": "When closing the window, hide to system tray instead of quitting"
+  },
+  "java": {
+    "title": "Java",
+    "description": "Configure Java installations for running Minecraft.",
+    "pathPlaceholder": "Path to java executable…",
+    "browse": "Browse",
+    "active": "Active",
+    "pathLabel": "Executable path"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "description": "Choose the default mod loader for new instances.",
+    "loaderLabel": "Preferred mod loader"
+  },
+  "common": {
+    "item": "Item",
+    "comingSoon": "Coming soon…"
+  },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "components": "Components"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "settings": {
+    "title": "Настройки",
+    "profile": "Профиль",
+    "appearance": "Внешний вид",
+    "java": "Java",
+    "minecraft": "Minecraft",
+    "language": "Язык",
+    "system": "Система"
+  },
+  "appearance": {
+    "title": "Внешний вид",
+    "description": "Настройте внешний вид Nero Launcher.",
+    "tabs": {
+      "theme": "Тема",
+      "colorMode": "Цветовой режим",
+      "colorScheme": "Цветовая схема"
+    },
+    "theme": {
+      "title": "Тема",
+      "description": "Выберите визуальную тему для лаунчера",
+      "builtin": "Встроенные",
+      "yourThemes": "Ваши темы",
+      "saveCurrent": "Сохранить текущую",
+      "import": "Импорт",
+      "customSplit": "Свой вариант…",
+      "customSplitTitle": "Раздельные варианты",
+      "lightMode": "Светлый режим",
+      "darkMode": "Тёмный режим",
+      "apply": "Применить",
+      "saveTheme": "Сохранить тему",
+      "themeName": "Название темы…",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "export": "Экспорт",
+      "delete": "Удалить",
+      "replaceConfirm": "Тема с именем \"{name}\" уже существует. Заменить?",
+      "deleteConfirm": "Удалить тему \"{name}\"?",
+      "importError": "Не удалось импортировать тему: неверный формат файла",
+      "accentColor": "Акцентный цвет",
+      "accentDefault": "По умолчанию"
+    },
+    "colorMode": {
+      "title": "Цветовой режим",
+      "description": "Выберите светлую, тёмную тему или следуйте системным настройкам",
+      "light": "Светлая",
+      "dark": "Тёмная",
+      "system": "Системная"
+    },
+    "colorScheme": {
+      "title": "Цветовая схема",
+      "description": "Настройте внешний вид интерфейса",
+      "blur": "Размытие фона",
+      "blurDesc": "Применить эффект blur к элементам со стеклянным стилем",
+      "density": "Плотность интерфейса",
+      "compact": "Компактный",
+      "normal": "Обычный",
+      "comfortable": "Просторный",
+      "fontFamily": "Семейство шрифта",
+      "fontSize": "Размер шрифта",
+      "scale": "Масштаб интерфейса"
+    }
+  },
+  "language": {
+    "title": "Язык",
+    "description": "Выберите язык интерфейса лаунчера",
+    "select": "Выбрать язык",
+    "en": "English",
+    "ru": "Русский"
+  },
+  "system": {
+    "title": "Система",
+    "minimizeToTray": "Сворачивать в трей",
+    "minimizeToTrayDesc": "При закрытии окна скрывать в системный трей вместо выхода"
+  },
+  "java": {
+    "title": "Java",
+    "description": "Настройте установки Java для запуска Minecraft.",
+    "pathPlaceholder": "Путь к исполняемому файлу java…",
+    "browse": "Обзор",
+    "active": "Активна",
+    "pathLabel": "Путь к исполняемому файлу"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "description": "Выберите мод-лоадер по умолчанию для новых экземпляров.",
+    "loaderLabel": "Предпочитаемый мод-лоадер"
+  },
+  "common": {
+    "item": "Пункт",
+    "comingSoon": "Скоро будет…"
+  },
+  "nav": {
+    "home": "Главная",
+    "settings": "Настройки",
+    "components": "Компоненты"
+  }
+}
