@@ -135,6 +135,14 @@
     "profileNamePlaceholder": "My awesome modpack…",
     "selectVersion": "Select a version to use"
   },
+  "instances": {
+    "title": "Instances",
+    "description": "Manage your game instances",
+    "create": "Create Instance",
+    "empty": "No instances yet",
+    "emptyDesc": "Create your first instance to get started",
+    "deleteConfirm": "Delete instance"
+  },
   "common": {
     "item": "Item",
     "comingSoon": "Coming soon…",

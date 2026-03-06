@@ -1,17 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)",
-      "Bash(yarn lint:*)",
-      "Bash(yarn tsc:*)",
-      "WebFetch(domain:v2.tauri.app)",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:blog.elijahlopez.ca)",
-      "WebFetch(domain:docs.papermc.io)",
-      "WebFetch(domain:kstefanj.github.io)",
-      "WebFetch(domain:aikar.co)",
-      "WebFetch(domain:www.leafmc.one)",
-      "Bash(cargo build:*)"
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "WebFetch",
+      "Grep",
+      "Glob",
+      "LS",
+      "MultiEdit",
+      "NotebookRead",
+      "NotebookEdit",
+      "TodoRead",
+      "TodoWrite",
+      "WebSearch"
     ]
   },
   "outputStyle": "default",

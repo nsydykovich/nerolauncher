@@ -135,6 +135,14 @@
     "profileNamePlaceholder": "Мой крутой модпак…",
     "selectVersion": "Выберите версию для использования"
   },
+  "instances": {
+    "title": "Профили",
+    "description": "Управляйте вашими профилями",
+    "create": "Создать профиль",
+    "empty": "Нет профилей",
+    "emptyDesc": "Создайте первый профиль, чтобы начать",
+    "deleteConfirm": "Удалить профиль"
+  },
   "common": {
     "item": "Пункт",
     "comingSoon": "Скоро будет…",

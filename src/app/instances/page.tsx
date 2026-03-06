@@ -1,10 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { useTranslation } from '@/shared/lib/i18n'
-import { ProfilesView } from '@/views/instances'
+import { InstancesView } from '@/views/instances'
 
-export default function ProfilesPage() {
-  const { t } = useTranslation()
-  return <ProfilesView />
+export default function InstancesPage() {
+  return <InstancesView />
 }
