@@ -1,56 +1,46 @@
-import * as React from "react";
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { ThemeProvider } from "@/components/misc/theme-provider";
-import "@/styles/globals.css";
+import * as React from 'react'
+import type { Metadata } from 'next'
+import { ThemeProvider, AppThemeProvider } from '@/shared/ui/theme-provider'
+import { AppTitlebar } from '@/shared/ui/app-titlebar'
+import { I18nProvider } from '@/shared/lib/i18n'
+import { CloseHandler } from '@/shared/ui/close-handler'
+import { Lexend, GeistSans, GeistMono, InterFont } from '@/shared/config/fonts'
+import '@/shared/styles/globals.css'
 
 export const metadata: Metadata = {
-  title: "Nero Launcher",
-  description: "Unofficial Minecraft Launcher built with NextJS and Tauri",
-};
-
-const Lexend = localFont({
-  src: "../fonts/lexend/lexend.woff2",
-  variable: "--font-lexend",
-  preload: true,
-  display: "swap",
-});
-
-const GeistSans = localFont({
-  src: "../fonts/geist/geist-sans.woff2",
-  variable: "--font-geist-sans",
-  preload: true,
-  display: "swap",
-});
-
-const GeistMono = localFont({
-  src: "../fonts/geist/geist-mono.woff2",
-  variable: "--font-geist-mono",
-  preload: true,
-  display: "swap",
-});
+	title: 'Nero Launcher',
+	description: 'Unofficial Minecraft Launcher built with NextJS and Tauri'
+}
 
 export default async function RootLayout({
-  children,
+	children
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode
 }>) {
-  return (
-    <html
-      lang="en"
-      className={`${Lexend.variable} ${GeistSans.variable} ${GeistMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html
+			lang='en'
+			className={`${Lexend.variable} ${GeistSans.variable} ${GeistMono.variable} ${InterFont.variable}`}
+			suppressHydrationWarning
+		>
+			<body className='bg-background text-foreground'>
+				<ThemeProvider
+					attribute='class'
+					defaultTheme='system'
+					enableSystem
+					disableTransitionOnChange
+				>
+					<AppThemeProvider>
+						<I18nProvider>
+							<CloseHandler />
+							<AppTitlebar />
+							<div className='pt-9 h-screen overflow-hidden'>
+								{children}
+							</div>
+						</I18nProvider>
+					</AppThemeProvider>
+				</ThemeProvider>
+			</body>
+		</html>
+	)
 }
