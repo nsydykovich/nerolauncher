@@ -34,7 +34,7 @@ export function useLauncher(): UseLauncherReturn {
       setIsLaunching(true)
       setError(null)
 
-      // First, download assets and libraries
+      // First, download assets and libraries (optional, don't block)
       try {
         await invoke('download_assets', {
           version_id: options.gameVersion,
