@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ThemeProvider, AppThemeProvider } from '@/shared/ui/theme-provider'
 import { AppTitlebar } from '@/shared/ui/app-titlebar'
 import { I18nProvider } from '@/shared/lib/i18n'
+import { AuthProvider } from '@/shared/lib/auth/auth-context'
 import { CloseHandler } from '@/shared/ui/close-handler'
 import { SplashWrapper } from '@/shared/ui/splash-screen'
 import { Lexend, GeistSans, GeistMono, InterFont } from '@/shared/config/fonts'
@@ -33,13 +34,15 @@ export default async function RootLayout({
 				>
 					<AppThemeProvider>
 						<I18nProvider>
-							<SplashWrapper>
-								<CloseHandler />
-								<AppTitlebar />
-								<div className='pt-9 h-screen overflow-hidden'>
-									{children}
-								</div>
-							</SplashWrapper>
+							<AuthProvider>
+								<SplashWrapper>
+									<CloseHandler />
+									<AppTitlebar />
+									<div className='pt-9 h-screen overflow-hidden'>
+										{children}
+									</div>
+								</SplashWrapper>
+							</AuthProvider>
 						</I18nProvider>
 					</AppThemeProvider>
 				</ThemeProvider>

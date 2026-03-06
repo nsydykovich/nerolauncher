@@ -256,3 +256,405 @@ pub fn list_installed_versions() -> Result<Vec<String>, String> {
 
     Ok(versions)
 }
+
+/// Download all assets for a specific version
+#[tauri::command]
+pub async fn download_assets(
+    app: AppHandle,
+    version_id: String,
+    asset_index_id: String,
+) -> Result<String, String> {
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let versions_dir = get_versions_dir()?;
+    let assets_dir = home.join(".nerolauncher").join("assets");
+    let indexes_dir = assets_dir.join("indexes");
+    let objects_dir = assets_dir.join("objects");
+
+    // Ensure directories exist
+    fs::create_dir_all(&objects_dir).map_err(|e| e.to_string())?;
+
+    // Read asset index JSON
+    let index_path = indexes_dir.join(format!("{}.json", asset_index_id));
+    if !index_path.exists() {
+        return Err(format!("Asset index {} not found. Download the version first.", asset_index_id));
+    }
+
+    let index_str = fs::read_to_string(&index_path)
+        .map_err(|e| format!("Failed to read asset index: {}", e))?;
+
+    let index: serde_json::Value = serde_json::from_str(&index_str)
+        .map_err(|e| format!("Failed to parse asset index: {}", e))?;
+
+    let assets_vec: Vec<(String, serde_json::Value)> = index
+        .get("objects")
+        .and_then(|o| o.as_object())
+        .ok_or("No objects found in asset index")?
+        .iter()
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect();
+
+    let total_assets = assets_vec.len() as u64;
+    let mut downloaded = 0u64;
+
+    // Download assets with limited parallelism (4 concurrent)
+    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(4));
+
+    let mut handles = vec![];
+
+    for (path, info) in assets_vec {
+        let app_clone = app.clone();
+        let version_id_clone = version_id.clone();
+        let objects_dir_clone = objects_dir.clone();
+        let semaphore_clone = semaphore.clone();
+
+        let handle = tokio::spawn(async move {
+            let _permit = semaphore_clone.acquire().await;
+
+            if let Some(hash) = info.get("hash").and_then(|h| h.as_str()) {
+                let hash_prefix = &hash[..2];
+                let asset_path = objects_dir_clone.join(hash_prefix).join(hash);
+
+                // Skip if already downloaded
+                if asset_path.exists() {
+                    return Ok((path.clone(), true));
+                }
+
+                // Create directory
+                fs::create_dir_all(asset_path.parent().unwrap())
+                    .map_err(|e| e.to_string())?;
+
+                // Download from Minecraft asset servers
+                let url = format!(
+                    "https://resources.download.minecraft.net/{}/{}",
+                    hash_prefix, hash
+                );
+
+                match reqwest::get(&url).await {
+                    Ok(response) => {
+                        match response.bytes().await {
+                            Ok(bytes) => {
+                                match fs::write(&asset_path, &bytes) {
+                                    Ok(_) => {
+                                        let _ = app_clone.emit("asset-progress", serde_json::json!({
+                                            "version_id": version_id_clone,
+                                            "asset": path,
+                                            "downloaded": true,
+                                        }));
+                                        Ok((path.clone(), true))
+                                    }
+                                    Err(e) => {
+                                        Err(format!("Failed to write asset {}: {}", path, e))
+                                    }
+                                }
+                            }
+                            Err(e) => Err(format!("Failed to read asset {}: {}", path, e)),
+                        }
+                    }
+                    Err(e) => {
+                        // Asset might not be critical, continue
+                        Ok((path.clone(), false))
+                    }
+                }
+            } else {
+                Ok((path.clone(), false))
+            }
+        });
+
+        handles.push(handle);
+    }
+
+    // Wait for all downloads
+    for handle in handles {
+        let _ = handle.await;
+        downloaded += 1;
+        let progress = (downloaded as f64 / total_assets as f64) * 100.0;
+        let _ = app.emit("download-progress", DownloadProgress {
+            version_id: version_id.clone(),
+            stage: "assets".to_string(),
+            progress,
+            total_bytes: total_assets,
+            downloaded_bytes: downloaded,
+        });
+    }
+
+    Ok(format!("Downloaded {} assets for {}", total_assets, version_id))
+}
+
+/// Download all libraries for a specific version
+#[tauri::command]
+pub async fn download_libraries(
+    app: AppHandle,
+    version_id: String,
+) -> Result<String, String> {
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let versions_dir = get_versions_dir()?;
+    let version_dir = versions_dir.join(&version_id);
+    let libs_dir = home.join(".nerolauncher").join("libraries");
+
+    // Ensure library directory exists
+    fs::create_dir_all(&libs_dir).map_err(|e| e.to_string())?;
+
+    // Read version.json
+    let version_json_path = version_dir.join(format!("{}.json", version_id));
+    if !version_json_path.exists() {
+        return Err("Version JSON not found. Download the version first.".to_string());
+    }
+
+    let version_json_str = fs::read_to_string(&version_json_path)
+        .map_err(|e| format!("Failed to read version.json: {}", e))?;
+
+    let version_json: serde_json::Value = serde_json::from_str(&version_json_str)
+        .map_err(|e| format!("Failed to parse version.json: {}", e))?;
+
+    let libraries_array = version_json
+        .get("libraries")
+        .and_then(|l| l.as_array())
+        .ok_or("No libraries found in version.json")?
+        .to_vec();
+
+    let total_libs = libraries_array.len() as u64;
+    let mut downloaded = 0u64;
+
+    // Limited parallelism (4 concurrent)
+    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(4));
+    let mut handles = vec![];
+
+    for lib in libraries_array.iter() {
+        let app_clone = app.clone();
+        let version_id_clone = version_id.clone();
+        let libs_dir_clone = libs_dir.clone();
+        let semaphore_clone = semaphore.clone();
+        let lib_clone = lib.clone();
+
+        let handle = tokio::spawn(async move {
+            let lib = lib_clone;
+            let _permit = semaphore_clone.acquire().await;
+
+            // Check OS rules
+            if let Some(rules) = lib.get("rules").and_then(|r| r.as_array()) {
+                let mut should_include = false;
+                for rule in rules {
+                    if let Some(action) = rule.get("action").and_then(|a| a.as_str()) {
+                        if action == "allow" {
+                            if let Some(os) = rule.get("os") {
+                                if let Some(os_name) = os.get("name").and_then(|n| n.as_str()) {
+                                    let current_os = std::env::consts::OS;
+                                    let os_match = match (os_name, current_os) {
+                                        ("windows", "windows") => true,
+                                        ("linux", "linux") => true,
+                                        ("osx", "macos") => true,
+                                        _ => false,
+                                    };
+                                    should_include = os_match;
+                                }
+                            } else {
+                                should_include = true;
+                            }
+                        } else if action == "disallow" {
+                            should_include = false;
+                        }
+                    }
+                }
+                if !should_include {
+                    return Ok(());
+                }
+            }
+
+            // Get library download info
+            if let Some(downloads) = lib.get("downloads") {
+                if let Some(artifact) = downloads.get("artifact") {
+                    if let Some(path) = artifact.get("path").and_then(|p| p.as_str()) {
+                        if let Some(url) = artifact.get("url").and_then(|u| u.as_str()) {
+                            let lib_path = libs_dir_clone.join(path);
+
+                            // Skip if already exists
+                            if lib_path.exists() {
+                                let _ = app_clone.emit("lib-progress", serde_json::json!({
+                                    "version_id": version_id_clone,
+                                    "library": path,
+                                    "downloaded": true,
+                                }));
+                                return Ok(());
+                            }
+
+                            // Create directory structure
+                            if let Some(parent) = lib_path.parent() {
+                                fs::create_dir_all(parent)
+                                    .map_err(|e| e.to_string())?;
+                            }
+
+                            // Download library
+                            match reqwest::get(url).await {
+                                Ok(response) => {
+                                    match response.bytes().await {
+                                        Ok(bytes) => {
+                                            fs::write(&lib_path, &bytes)
+                                                .map_err(|e| format!("Failed to write library: {}", e))?;
+                                            let _ = app_clone.emit("lib-progress", serde_json::json!({
+                                                "version_id": version_id_clone,
+                                                "library": path,
+                                                "downloaded": true,
+                                            }));
+                                            Ok(())
+                                        }
+                                        Err(e) => Err(format!("Failed to read library: {}", e)),
+                                    }
+                                }
+                                Err(e) => {
+                                    // Log error but continue
+                                    eprintln!("Failed to download library {}: {}", path, e);
+                                    Ok(())
+                                }
+                            }
+                        } else {
+                            Ok(())
+                        }
+                    } else {
+                        Ok(())
+                    }
+                } else {
+                    Ok(())
+                }
+            } else {
+                Ok(())
+            }
+        });
+
+        handles.push(handle);
+    }
+
+    // Wait for all downloads
+    for handle in handles {
+        let _ = handle.await;
+        downloaded += 1;
+        let progress = (downloaded as f64 / total_libs as f64) * 100.0;
+        let _ = app.emit("download-progress", DownloadProgress {
+            version_id: version_id.clone(),
+            stage: "libraries".to_string(),
+            progress,
+            total_bytes: total_libs,
+            downloaded_bytes: downloaded,
+        });
+    }
+
+    Ok(format!("Downloaded libraries for {}", version_id))
+}
+
+/// Download native libraries (LWJGL natives, etc.)
+#[tauri::command]
+pub async fn download_natives(
+    app: AppHandle,
+    version_id: String,
+) -> Result<String, String> {
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let versions_dir = get_versions_dir()?;
+    let version_dir = versions_dir.join(&version_id);
+    let libs_dir = home.join(".nerolauncher").join("libraries");
+    let natives_dir = version_dir.join("natives");
+
+    // Create natives directory
+    fs::create_dir_all(&natives_dir).map_err(|e| e.to_string())?;
+
+    // Read version.json
+    let version_json_path = version_dir.join(format!("{}.json", version_id));
+    let version_json_str = fs::read_to_string(&version_json_path)
+        .map_err(|e| format!("Failed to read version.json: {}", e))?;
+
+    let version_json: serde_json::Value = serde_json::from_str(&version_json_str)
+        .map_err(|e| format!("Failed to parse version.json: {}", e))?;
+
+    let libraries = version_json
+        .get("libraries")
+        .and_then(|l| l.as_array())
+        .ok_or("No libraries found")?;
+
+    let mut extracted = 0u64;
+    let mut total = 0u64;
+
+    for lib in libraries {
+        if let Some(natives) = lib.get("natives") {
+            total += 1;
+
+            // Get classifier for current platform
+            let current_os = std::env::consts::OS;
+            let classifier_key = match current_os {
+                "windows" => "natives-windows",
+                "linux" => "natives-linux",
+                "macos" => "natives-macos",
+                _ => continue,
+            };
+
+            if let Some(classifier) = natives.get(classifier_key).and_then(|c| c.as_str()) {
+                if let Some(downloads) = lib.get("downloads") {
+                    if let Some(classifiers) = downloads.get("classifiers") {
+                        if let Some(native_info) = classifiers.get(classifier) {
+                            if let Some(url) = native_info.get("url").and_then(|u| u.as_str()) {
+                                // Download native JAR
+                                match reqwest::get(url).await {
+                                    Ok(response) => {
+                                        match response.bytes().await {
+                                            Ok(bytes) => {
+                                                // Extract natives from JAR
+                                                use std::io::Cursor;
+                                                match zip::ZipArchive::new(Cursor::new(bytes.to_vec())) {
+                                                    Ok(mut archive) => {
+                                                        for i in 0..archive.len() {
+                                                            if let Ok(mut file) = archive.by_index(i) {
+                                                                if !file.is_dir() && file.name().ends_with(".so")
+                                                                    || file.name().ends_with(".dll")
+                                                                    || file.name().ends_with(".dylib") {
+
+                                                                    let file_name = std::path::Path::new(file.name())
+                                                                        .file_name()
+                                                                        .and_then(|n| n.to_str())
+                                                                        .unwrap_or("unknown");
+
+                                                                    let native_path = natives_dir.join(file_name);
+                                                                    let mut output = fs::File::create(&native_path)
+                                                                        .map_err(|e| e.to_string())?;
+                                                                    std::io::copy(&mut file, &mut output)
+                                                                        .map_err(|e| e.to_string())?;
+                                                                }
+                                                            }
+                                                        }
+                                                        extracted += 1;
+                                                    }
+                                                    Err(_) => {
+                                                        // Not a JAR, skip
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                eprintln!("Failed to read native JAR: {}", e);
+                                            }
+                                        }
+                                    }
+                                    Err(e) => {
+                                        eprintln!("Failed to download native: {}", e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            let progress = (extracted as f64 / total as f64) * 100.0;
+            let _ = app.emit("download-progress", DownloadProgress {
+                version_id: version_id.clone(),
+                stage: "natives".to_string(),
+                progress,
+                total_bytes: total,
+                downloaded_bytes: extracted,
+            });
+        }
+    }
+
+    Ok(format!("Extracted natives for {}", version_id))
+}

@@ -1,4 +1,5 @@
 use std::process::Command;
+use std::path::PathBuf;
 use tauri::State;
 use crate::db::DbState;
 
@@ -40,6 +41,104 @@ pub fn resolve_game_dir(
     }
 }
 
+/// Build classpath from libraries and client JAR
+fn build_classpath(game_version: &str) -> Result<String, String> {
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let versions_dir = home.join(".nerolauncher").join("versions");
+    let version_dir = versions_dir.join(game_version);
+    let libs_dir = home.join(".nerolauncher").join("libraries");
+
+    // Load version.json to get list of libraries
+    let version_json_path = version_dir.join(format!("{}.json", game_version));
+    let version_json_str = std::fs::read_to_string(&version_json_path)
+        .map_err(|e| format!("Failed to read version.json: {}", e))?;
+
+    let version_json: serde_json::Value = serde_json::from_str(&version_json_str)
+        .map_err(|e| format!("Failed to parse version.json: {}", e))?;
+
+    let mut classpath_parts = Vec::new();
+
+    // Add client JAR first
+    let client_jar = version_dir.join(format!("{}.jar", game_version));
+    classpath_parts.push(client_jar.to_string_lossy().to_string());
+
+    // Add libraries from version.json
+    if let Some(libraries) = version_json.get("libraries").and_then(|l| l.as_array()) {
+        for lib in libraries {
+            // Check if library should be included (OS rules)
+            if let Some(rules) = lib.get("rules").and_then(|r| r.as_array()) {
+                let mut should_include = false;
+                for rule in rules {
+                    if let Some(action) = rule.get("action").and_then(|a| a.as_str()) {
+                        if action == "allow" {
+                            // Check OS condition
+                            if let Some(os) = rule.get("os") {
+                                if let Some(os_name) = os.get("name").and_then(|n| n.as_str()) {
+                                    let current_os = std::env::consts::OS;
+                                    let os_match = match (os_name, current_os) {
+                                        ("windows", "windows") => true,
+                                        ("linux", "linux") => true,
+                                        ("osx", "macos") => true,
+                                        _ => false,
+                                    };
+                                    should_include = os_match;
+                                }
+                            } else {
+                                should_include = true;
+                            }
+                        } else if action == "disallow" {
+                            should_include = false;
+                        }
+                    }
+                }
+
+                if !should_include {
+                    continue;
+                }
+            }
+
+            // Get library name and construct path
+            if let Some(name) = lib.get("name").and_then(|n| n.as_str()) {
+                let parts: Vec<&str> = name.split(':').collect();
+                if parts.len() >= 3 {
+                    let lib_path = format!(
+                        "{}/{}/{}/{}",
+                        parts[0].replace('.', "/"),
+                        parts[1],
+                        parts[2],
+                        format!("{}-{}.jar", parts[1], parts[2])
+                    );
+                    let full_path = libs_dir.join(&lib_path);
+
+                    if full_path.exists() {
+                        classpath_parts.push(full_path.to_string_lossy().to_string());
+                    }
+                }
+            }
+        }
+    }
+
+    // Join with platform-specific separator
+    let separator = if cfg!(windows) { ";" } else { ":" };
+    Ok(classpath_parts.join(separator))
+}
+
+/// Get natives directory path
+fn get_natives_dir(game_version: &str) -> Result<PathBuf, String> {
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let natives_dir = home
+        .join(".nerolauncher")
+        .join("versions")
+        .join(game_version)
+        .join("natives");
+
+    Ok(natives_dir)
+}
+
 /// Launch Minecraft with specified profile
 /// Returns PID of the launched process
 #[tauri::command]
@@ -50,6 +149,9 @@ pub fn launch_game(
     game_dir_strategy: String,
     java_args: Option<String>,
     extra_args: Option<String>,
+    username: String,
+    uuid: String,
+    access_token: String,
     db: State<DbState>,
 ) -> Result<u32, String> {
     // Parse strategy
@@ -66,6 +168,26 @@ pub fn launch_game(
     // Ensure game directory exists
     std::fs::create_dir_all(&game_dir).map_err(|e| e.to_string())?;
 
+    let home = dirs::home_dir()
+        .ok_or("Could not determine home directory")?;
+
+    let assets_dir = home.join(".nerolauncher").join("assets");
+    let version_dir = home.join(".nerolauncher").join("versions").join(&game_version);
+
+    // Get asset index ID from version.json
+    let version_json_path = version_dir.join(format!("{}.json", &game_version));
+    let version_json_str = std::fs::read_to_string(&version_json_path)
+        .map_err(|e| format!("Failed to read version.json: {}", e))?;
+
+    let version_json: serde_json::Value = serde_json::from_str(&version_json_str)
+        .map_err(|e| format!("Failed to parse version.json: {}", e))?;
+
+    let asset_index = version_json
+        .get("assetIndex")
+        .and_then(|a| a.get("id"))
+        .and_then(|i| i.as_str())
+        .unwrap_or("legacy");
+
     // Get Java path from database
     let java_path = {
         let conn = db.0.lock().map_err(|e| e.to_string())?;
@@ -74,31 +196,23 @@ pub fn launch_game(
 
         crate::db::settings::get_setting(&conn, &setting_key)
             .map_err(|e| e.to_string())?
-            .unwrap_or_else(|| {
-                // Fallback: try to find java in PATH
-                if let Ok(output) = Command::new("java").arg("-version").output() {
-                    String::from_utf8_lossy(&output.stderr).to_string()
-                } else {
-                    "java".to_string()
-                }
-            })
+            .unwrap_or_else(|| "java".to_string())
     };
 
-    // Build command
+    // Build classpath
+    let classpath = build_classpath(&game_version)?;
+
+    // Get natives directory
+    let natives_dir = get_natives_dir(&game_version)?;
+    std::fs::create_dir_all(&natives_dir).map_err(|e| e.to_string())?;
+
+    // Build JVM command
     let mut cmd = Command::new(&java_path);
 
-    // Check if we need default memory settings
+    // Add memory settings
     let has_xmx = java_args.as_ref().map(|a| a.contains("-Xmx")).unwrap_or(false);
     let has_xms = java_args.as_ref().map(|a| a.contains("-Xms")).unwrap_or(false);
 
-    // Add Java arguments
-    if let Some(args) = &java_args {
-        for arg in args.split_whitespace() {
-            cmd.arg(arg);
-        }
-    }
-
-    // Add memory defaults if not specified
     if !has_xmx {
         cmd.arg("-Xmx2048M");
     }
@@ -106,23 +220,44 @@ pub fn launch_game(
         cmd.arg("-Xms512M");
     }
 
-    // Game directory
-    cmd.arg("-Dminecraft.client.jar.storage=").arg(&game_dir);
+    // Add custom Java arguments if provided
+    if let Some(args) = &java_args {
+        for arg in args.split_whitespace() {
+            cmd.arg(arg);
+        }
+    }
 
-    // Version
-    cmd.arg("-Dminecraft.version=").arg(&game_version);
+    // Add natives library path
+    let natives_path = natives_dir.to_string_lossy().to_string();
+    cmd.arg(format!("-Djava.library.path={}", natives_path));
 
-    // Extra arguments
+    // Add classpath
+    cmd.arg("-cp");
+    cmd.arg(classpath);
+
+    // Main class — PROPER Minecraft launcher
+    cmd.arg("net.minecraft.client.main.Main");
+
+    // Game arguments
+    cmd.arg("--username").arg(&username);
+    cmd.arg("--uuid").arg(&uuid);
+    cmd.arg("--accessToken").arg(&access_token);
+    cmd.arg("--userType").arg("msa");
+    cmd.arg("--versionType").arg("release");
+    cmd.arg("--version").arg(&game_version);
+    cmd.arg("--gameDir").arg(&game_dir);
+    cmd.arg("--assetsDir").arg(assets_dir.to_string_lossy().to_string());
+    cmd.arg("--assetIndex").arg(asset_index);
+    cmd.arg("--nativesDirectory").arg(natives_path);
+
+    // Add extra arguments if provided
     if let Some(extra) = extra_args {
         for arg in extra.split_whitespace() {
             cmd.arg(arg);
         }
     }
 
-    // Main class (placeholder — real implementation would need proper launcher)
-    cmd.arg("net.minecraft.launcher.Bootstrap");
-
-    // Launch
+    // Launch the game
     let child = cmd.spawn().map_err(|e| e.to_string())?;
 
     // Update profile's last played time

@@ -9,6 +9,9 @@ interface LaunchOptions {
   gameVersion: string
   javaVersion: number
   gameDirStrategy: GameDirStrategy
+  username: string
+  uuid: string
+  accessToken: string
   javaArgs?: string
   extraArgs?: string
 }
@@ -31,13 +34,43 @@ export function useLauncher(): UseLauncherReturn {
       setIsLaunching(true)
       setError(null)
 
+      // First, download assets and libraries
+      try {
+        await invoke('download_assets', {
+          version_id: options.gameVersion,
+          asset_index_id: options.gameVersion,
+        })
+      } catch (e) {
+        console.warn('Asset download warning:', e)
+      }
+
+      try {
+        await invoke('download_libraries', {
+          version_id: options.gameVersion,
+        })
+      } catch (e) {
+        console.warn('Library download warning:', e)
+      }
+
+      try {
+        await invoke('download_natives', {
+          version_id: options.gameVersion,
+        })
+      } catch (e) {
+        console.warn('Native download warning:', e)
+      }
+
+      // Now launch the game with auth
       const launchPid = await invoke<number>('launch_game', {
-        profileId: options.profileId,
-        gameVersion: options.gameVersion,
-        javaVersion: options.javaVersion,
-        gameDirStrategy: options.gameDirStrategy,
-        javaArgs: options.javaArgs,
-        extraArgs: options.extraArgs,
+        profile_id: options.profileId,
+        game_version: options.gameVersion,
+        java_version: options.javaVersion,
+        game_dir_strategy: options.gameDirStrategy,
+        username: options.username,
+        uuid: options.uuid,
+        access_token: options.accessToken,
+        java_args: options.javaArgs,
+        extra_args: options.extraArgs,
       })
 
       setPid(launchPid)
@@ -59,7 +92,7 @@ export function useLauncher(): UseLauncherReturn {
     async (profileId: string, strategy: GameDirStrategy): Promise<string> => {
       try {
         return await invoke<string>('get_game_dir', {
-          profileId,
+          profile_id: profileId,
           strategy,
         })
       } catch (err) {

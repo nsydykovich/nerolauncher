@@ -5,6 +5,7 @@ import { Play, ChevronDown, Clock, RefreshCw, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { useProfiles } from '@/features/profile-manager'
 import { useLauncher } from '@/features/game-launcher'
+import { useAuth } from '@/shared/lib/auth/auth-context'
 import type { Profile } from '@/entities/profile'
 
 export function HeroSection({
@@ -22,18 +23,27 @@ export function HeroSection({
 }) {
     const { profiles } = useProfiles()
     const { isLaunching: launcherIsLaunching, launch } = useLauncher()
+    const { activeAccount } = useAuth()
     const [profileDropdownOpen, setProfileDropdownOpen] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
 
     const isLaunching = externalIsLaunching || launcherIsLaunching
 
     const handlePlay = async () => {
+        if (!activeAccount) {
+            console.error('No active account')
+            return
+        }
+
         externalOnPlay()
         await launch({
             profileId: activeProfileId,
             gameVersion: activeProfile.gameVersion,
             javaVersion: activeProfile.javaVersion,
             gameDirStrategy: 'per-profile', // TODO: get from settings
+            username: activeAccount.username,
+            uuid: activeAccount.uuid,
+            accessToken: activeAccount.accessToken,
             javaArgs: activeProfile.javaArgs,
         })
     }

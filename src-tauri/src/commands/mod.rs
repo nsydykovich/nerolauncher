@@ -5,3 +5,4 @@ pub mod profiles;
 pub mod launcher;
 pub mod downloader;
 pub mod news;
+pub mod verifier;
