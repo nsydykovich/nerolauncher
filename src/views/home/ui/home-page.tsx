@@ -1,12 +1,14 @@
 'use client'
 
 import * as React from 'react'
+import { Terminal } from 'lucide-react'
 import { useInstances } from '@/features/instance-manager'
 import { useLauncher } from '@/features/game-launcher/model/use-launcher'
 import { useAuth } from '@/shared/lib/auth/auth-context'
+import { useConsole } from '@/shared/lib/hooks/use-console'
 import { InstanceShowcase } from './instance-showcase'
-import { NewsFeed } from './news-feed'
-import { ModsPanel } from './mods-panel'
+import { ConsolePanel } from '@/shared/ui/console-panel'
+import { Button } from '@/shared/ui/button'
 
 export function HomePage() {
     const { profiles: instances, isLoading } = useInstances()
@@ -14,6 +16,7 @@ export function HomePage() {
     const [isLaunching, setIsLaunching] = React.useState(false)
     const { launch } = useLauncher()
     const { activeAccount } = useAuth()
+    const console = useConsole()
 
     // Set first instance as active once instances load
     React.useEffect(() => {
@@ -28,7 +31,14 @@ export function HomePage() {
         if (!activeInstance || !activeAccount) return
 
         setIsLaunching(true)
+        console.openConsole()
+        console.clear()
+        console.addMessage('Starting Minecraft launch...', 'info')
+
         try {
+            console.addMessage(`Instance: ${activeInstance.name}`, 'info')
+            console.addMessage(`Version: ${activeInstance.gameVersion}`, 'info')
+
             await launch({
                 profileId: activeInstance.id,
                 gameVersion: activeInstance.gameVersion,
@@ -39,8 +49,11 @@ export function HomePage() {
                 accessToken: activeAccount.accessToken,
                 javaArgs: activeInstance.javaArgs,
             })
+            console.addMessage('Minecraft launched successfully!', 'success')
         } catch (error) {
-            console.error('Launch failed:', error)
+            const message = error instanceof Error ? error.message : String(error)
+            console.addMessage(`Launch failed: ${message}`, 'error')
+            console.addMessage(JSON.stringify(error, null, 2), 'error')
         } finally {
             setIsLaunching(false)
         }
@@ -58,23 +71,60 @@ export function HomePage() {
     }
 
     return (
-        <main className='flex-1 flex flex-col overflow-hidden bg-background'>
+        <main className='flex-1 flex flex-col overflow-hidden bg-background pb-64'>
             {/* Instance Showcase */}
             <div className='p-6 border-b border-border/50'>
-                <InstanceShowcase
-                    instance={activeInstance}
-                    isLaunching={isLaunching}
-                    onPlay={handlePlay}
-                />
-            </div>
-
-            {/* News Feed and Mods Panel */}
-            <div className='flex-1 overflow-y-auto'>
-                <div className='grid grid-cols-[1fr_280px] gap-0 h-full'>
-                    <NewsFeed onSelectProfile={setActiveInstanceId} />
-                    <ModsPanel />
+                <div className='flex items-start justify-between gap-4'>
+                    <div className='flex-1'>
+                        <InstanceShowcase
+                            instance={activeInstance}
+                            isLaunching={isLaunching}
+                            onPlay={handlePlay}
+                        />
+                    </div>
                 </div>
             </div>
+
+            {/* Console Toggle Button */}
+            <div className='flex-shrink-0 px-6 py-4 border-b border-border/50'>
+                <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={console.toggleConsole}
+                    className='gap-2'
+                >
+                    <Terminal className='h-4 w-4' />
+                    {console.isOpen ? 'Hide Console' : 'Show Console'}
+                </Button>
+            </div>
+
+            {/* Coming Soon Section */}
+            <div className='flex-1 overflow-y-auto px-6 py-8'>
+                <div className='max-w-2xl mx-auto space-y-8'>
+                    <div className='rounded-lg border border-border/50 bg-muted/30 p-6'>
+                        <h2 className='text-lg font-semibold mb-2'>📰 News & Updates</h2>
+                        <p className='text-sm text-muted-foreground'>Coming soon...</p>
+                    </div>
+
+                    <div className='rounded-lg border border-border/50 bg-muted/30 p-6'>
+                        <h2 className='text-lg font-semibold mb-2'>🎮 Mods & Content</h2>
+                        <p className='text-sm text-muted-foreground'>Coming soon...</p>
+                    </div>
+
+                    <div className='rounded-lg border border-border/50 bg-muted/30 p-6'>
+                        <h2 className='text-lg font-semibold mb-2'>⭐ Featured</h2>
+                        <p className='text-sm text-muted-foreground'>Coming soon...</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Console Panel */}
+            <ConsolePanel
+                isOpen={console.isOpen}
+                onClose={console.closeConsole}
+                messages={console.messages}
+                onClear={console.clear}
+            />
         </main>
     )
 }
