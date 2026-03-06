@@ -1,4 +1,5 @@
 export { LampContainer, LampDemo } from './lamp'
+export { SplashScreen, SplashWrapper } from './splash-screen'
 export { AppTitlebar } from './app-titlebar'
 export { ThemeProvider, AppThemeProvider, useAppTheme } from './theme-provider'
 export {

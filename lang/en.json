@@ -93,12 +93,50 @@
   },
   "minecraft": {
     "title": "Minecraft",
-    "description": "Choose the default mod loader for new instances.",
-    "loaderLabel": "Preferred mod loader"
+    "description": "Global settings applied to all profiles.",
+    "console": "Console & Logging",
+    "consoleDesc": "Control console visibility when launching games",
+    "showConsole": "Show Console",
+    "showConsoleDesc": "Display game console window during launch",
+    "showErrorConsole": "Show Error Console",
+    "showErrorConsoleDesc": "Always show console if game crashes or has errors",
+    "keepLauncher": "Keep Launcher Open",
+    "keepLauncherDesc": "Don't close launcher when game starts"
+  },
+  "profiles": {
+    "title": "Profiles",
+    "description": "Manage your game profiles and Minecraft versions",
+    "create": "Create Profile",
+    "import": "Import",
+    "export": "Export",
+    "empty": "No profiles yet",
+    "emptyDesc": "Create your first profile to get started",
+    "versions": "Minecraft Versions",
+    "versionsDesc": "Download and manage Minecraft versions",
+    "loader": "Mod Loader",
+    "loaderVanilla": "Vanilla",
+    "loaderForge": "Forge",
+    "loaderNeoForge": "NeoForge",
+    "loaderFabric": "Fabric",
+    "loaderQuilt": "Quilt",
+    "filterAll": "All",
+    "filterRelease": "Releases",
+    "filterSnapshot": "Snapshots",
+    "filterOld": "Legacy",
+    "download": "Download",
+    "delete": "Delete",
+    "installed": "Installed",
+    "noVersions": "No versions found",
+    "gameDir": "Game Directory",
+    "gameDirGlobal": "Global (.minecraft)",
+    "gameDirProfile": "Per-Profile",
+    "gameDirFamily": "Per-Family"
   },
   "common": {
     "item": "Item",
-    "comingSoon": "Coming soon…"
+    "comingSoon": "Coming soon…",
+    "error": "Error",
+    "loading": "Loading…"
   },
   "nav": {
     "home": "Home",

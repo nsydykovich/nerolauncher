@@ -48,6 +48,7 @@ export function useVersions(): UseVersionsReturn {
         type: v.type as 'release' | 'snapshot' | 'old_alpha' | 'old_beta',
         releaseTime: new Date(v.releaseTime).getTime(),
         installed: v.installed,
+        url: v.url,
         size: v.size,
       }))
 

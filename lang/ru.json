@@ -93,12 +93,50 @@
   },
   "minecraft": {
     "title": "Minecraft",
-    "description": "Выберите мод-лоадер по умолчанию для новых экземпляров.",
-    "loaderLabel": "Предпочитаемый мод-лоадер"
+    "description": "Глобальные настройки для всех профилей.",
+    "console": "Консоль и логи",
+    "consoleDesc": "Управление видимостью консоли при запуске игры",
+    "showConsole": "Показывать консоль",
+    "showConsoleDesc": "Показывать окно консоли игры при запуске",
+    "showErrorConsole": "Показывать при ошибках",
+    "showErrorConsoleDesc": "Всегда показывать консоль при краше или ошибках игры",
+    "keepLauncher": "Не закрывать лаунчер",
+    "keepLauncherDesc": "Не закрывать лаунчер после запуска игры"
+  },
+  "profiles": {
+    "title": "Профили",
+    "description": "Управление профилями и версиями Minecraft",
+    "create": "Создать профиль",
+    "import": "Импорт",
+    "export": "Экспорт",
+    "empty": "Нет профилей",
+    "emptyDesc": "Создайте первый профиль, чтобы начать",
+    "versions": "Версии Minecraft",
+    "versionsDesc": "Загрузка и управление версиями Minecraft",
+    "loader": "Мод-лоадер",
+    "loaderVanilla": "Vanilla",
+    "loaderForge": "Forge",
+    "loaderNeoForge": "NeoForge",
+    "loaderFabric": "Fabric",
+    "loaderQuilt": "Quilt",
+    "filterAll": "Все",
+    "filterRelease": "Релизы",
+    "filterSnapshot": "Снапшоты",
+    "filterOld": "Старые",
+    "download": "Скачать",
+    "delete": "Удалить",
+    "installed": "Установлено",
+    "noVersions": "Версий не найдено",
+    "gameDir": "Папка игры",
+    "gameDirGlobal": "Общая (.minecraft)",
+    "gameDirProfile": "Для каждого профиля",
+    "gameDirFamily": "Для семейства"
   },
   "common": {
     "item": "Пункт",
-    "comingSoon": "Скоро будет…"
+    "comingSoon": "Скоро будет…",
+    "error": "Ошибка",
+    "loading": "Загрузка…"
   },
   "nav": {
     "home": "Главная",

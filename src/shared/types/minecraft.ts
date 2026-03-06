@@ -13,5 +13,6 @@ export interface MinecraftVersion {
   type: 'release' | 'snapshot' | 'old_alpha' | 'old_beta'
   releaseTime: number
   installed: boolean
+  url?: string
   size?: number
 }

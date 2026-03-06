@@ -16,29 +16,22 @@ export function MinecraftSection() {
   return (
     <div className='space-y-6'>
       <div>
-        <h2 className='text-2xl font-semibold'>Minecraft Global Settings</h2>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          These settings apply to all profiles unless overridden per-profile
-        </p>
+        <h2 className='text-2xl font-semibold'>{t('minecraft.title')}</h2>
+        <p className='mt-1 text-sm text-muted-foreground'>{t('minecraft.description')}</p>
       </div>
 
-      {/* Console Settings */}
       <Card>
         <CardHeader>
-          <CardTitle className='text-sm'>Console & Logging</CardTitle>
-          <CardDescription>
-            Control console visibility when launching games
-          </CardDescription>
+          <CardTitle className='text-sm'>{t('minecraft.console')}</CardTitle>
+          <CardDescription>{t('minecraft.consoleDesc')}</CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-3'>
               <Eye className='h-4 w-4 text-muted-foreground' />
               <div>
-                <Label className='text-sm font-medium'>Show Console</Label>
-                <p className='text-xs text-muted-foreground mt-0.5'>
-                  Display game console window during launch
-                </p>
+                <Label className='text-sm font-medium'>{t('minecraft.showConsole')}</Label>
+                <p className='text-xs text-muted-foreground mt-0.5'>{t('minecraft.showConsoleDesc')}</p>
               </div>
             </div>
             <Switch checked={showConsole} onCheckedChange={setShowConsole} />
@@ -48,10 +41,8 @@ export function MinecraftSection() {
             <div className='flex items-center gap-3'>
               <AlertCircle className='h-4 w-4 text-amber-500' />
               <div>
-                <Label className='text-sm font-medium'>Show Error Console</Label>
-                <p className='text-xs text-muted-foreground mt-0.5'>
-                  Always show console if game crashes or has errors
-                </p>
+                <Label className='text-sm font-medium'>{t('minecraft.showErrorConsole')}</Label>
+                <p className='text-xs text-muted-foreground mt-0.5'>{t('minecraft.showErrorConsoleDesc')}</p>
               </div>
             </div>
             <Switch checked={showErrorConsole} onCheckedChange={setShowErrorConsole} />
@@ -61,23 +52,14 @@ export function MinecraftSection() {
             <div className='flex items-center gap-3'>
               <EyeOff className='h-4 w-4 text-muted-foreground' />
               <div>
-                <Label className='text-sm font-medium'>Keep Launcher Open</Label>
-                <p className='text-xs text-muted-foreground mt-0.5'>
-                  Don't close launcher when game starts
-                </p>
+                <Label className='text-sm font-medium'>{t('minecraft.keepLauncher')}</Label>
+                <p className='text-xs text-muted-foreground mt-0.5'>{t('minecraft.keepLauncherDesc')}</p>
               </div>
             </div>
             <Switch checked={keepLauncherOpen} onCheckedChange={setKeepLauncherOpen} />
           </div>
         </CardContent>
       </Card>
-
-      {/* Info Card */}
-      <div className='rounded-lg bg-blue-500/10 border border-blue-500/20 px-4 py-3'>
-        <p className='text-xs text-blue-600 dark:text-blue-400'>
-          <strong>💡 Tip:</strong> You can override these settings per-profile in the Profiles section
-        </p>
-      </div>
     </div>
   )
 }
