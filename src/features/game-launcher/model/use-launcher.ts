@@ -63,7 +63,7 @@ export function useLauncher(): UseLauncherReturn {
       }
 
       // Now launch the game with auth
-      const launchPid = await invoke<number>('launch_game', {
+      const launchArgs = {
         profile_id: options.profileId,
         game_version: options.gameVersion,
         java_version: options.javaVersion,
@@ -73,7 +73,9 @@ export function useLauncher(): UseLauncherReturn {
         access_token: options.accessToken,
         java_args: options.javaArgs,
         extra_args: options.extraArgs,
-      })
+      }
+      console.log('Launching game with args:', launchArgs)
+      const launchPid = await invoke<number>('launch_game', launchArgs)
 
       setPid(launchPid)
 
