@@ -4,7 +4,7 @@ use std::sync::Mutex;
 
 pub mod settings;
 pub mod themes;
-pub mod profiles;
+pub mod instances;
 pub mod news;
 
 pub struct DbState(pub Mutex<Connection>);
@@ -24,7 +24,7 @@ pub fn init_db(app_data_dir: &PathBuf) -> Result<Connection> {
         );",
     )?;
     themes::init_themes_table(&conn)?;
-    profiles::init_profiles_table(&conn)?;
+    instances::init_profiles_table(&conn)?;
     news::create_news_table(&conn)?;
     Ok(conn)
 }

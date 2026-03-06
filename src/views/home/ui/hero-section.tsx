@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Play, ChevronDown, Clock, RefreshCw, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { useProfiles } from '@/features/profile-manager'
+import { useProfiles } from '@/features/instance-manager'
 import { useLauncher } from '@/features/game-launcher'
 import { useAuth } from '@/shared/lib/auth/auth-context'
 import type { Profile } from '@/entities/profile'

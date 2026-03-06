@@ -129,7 +129,7 @@
     "noVersions": "Версий не найдено",
     "gameDir": "Папка игры",
     "gameDirGlobal": "Общая (.minecraft)",
-    "gameDirProfile": "Для каждого профиля",
+    "gameDirInstance": "Для каждого профиля",
     "gameDirFamily": "Для семейства",
     "profileName": "Название профиля",
     "profileNamePlaceholder": "Мой крутой модпак…",

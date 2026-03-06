@@ -1,7 +1,7 @@
 {
   "settings": {
     "title": "Settings",
-    "profile": "Profile",
+    "profile": "Instance",
     "appearance": "Appearance",
     "java": "Java",
     "minecraft": "Minecraft",
@@ -104,9 +104,9 @@
     "keepLauncherDesc": "Don't close launcher when game starts"
   },
   "profiles": {
-    "title": "Profiles",
+    "title": "Instances",
     "description": "Manage your game profiles and Minecraft versions",
-    "create": "Create Profile",
+    "create": "Create Instance",
     "import": "Import",
     "export": "Export",
     "empty": "No profiles yet",
@@ -129,9 +129,9 @@
     "noVersions": "No versions found",
     "gameDir": "Game Directory",
     "gameDirGlobal": "Global (.minecraft)",
-    "gameDirProfile": "Per-Profile",
+    "gameDirInstance": "Per-Instance",
     "gameDirFamily": "Per-Family",
-    "profileName": "Profile Name",
+    "profileName": "Instance Name",
     "profileNamePlaceholder": "My awesome modpack…",
     "selectVersion": "Select a version to use"
   },
@@ -143,7 +143,7 @@
   },
   "nav": {
     "home": "Home",
-    "profiles": "Profiles",
+    "profiles": "Instances",
     "catalog": "Catalog",
     "settings": "Settings",
     "components": "Components"

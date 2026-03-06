@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { Plus, Upload, Download as DownloadIcon, Layers, Play, Clock, Gamepad2 } from 'lucide-react'
-import { useProfiles } from '@/features/profile-manager'
+import { useProfiles } from '@/features/instance-manager'
 import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
 import { cn } from '@/shared/lib/utils'

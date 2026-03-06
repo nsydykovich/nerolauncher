@@ -263,7 +263,7 @@ pub fn launch_game(
     // Update profile's last played time
     {
         let conn = db.0.lock().map_err(|e| e.to_string())?;
-        let _ = crate::db::profiles::update_last_played(&conn, &profile_id);
+        let _ = crate::db::instances::update_last_played(&conn, &profile_id);
     }
 
     Ok(child.id())

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Clock, Package, Folder, Settings, Plus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { useProfiles } from '@/features/profile-manager'
+import { useProfiles } from '@/features/instance-manager'
 import type { Profile } from '@/entities/profile'
 
 function StatBadge({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {

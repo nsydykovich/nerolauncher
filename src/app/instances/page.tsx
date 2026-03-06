@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useTranslation } from '@/shared/lib/i18n'
-import { ProfilesView } from '@/views/profiles'
+import { ProfilesView } from '@/views/instances'
 
 export default function ProfilesPage() {
   const { t } = useTranslation()

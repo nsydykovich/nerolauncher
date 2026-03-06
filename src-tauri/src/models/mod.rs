@@ -1,5 +1,5 @@
-pub mod profile;
+pub mod instance;
 pub mod download;
 
-pub use profile::Profile;
+pub use instance::Profile;
 pub use download::*;

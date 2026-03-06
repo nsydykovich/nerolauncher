@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useProfiles } from '@/features/profile-manager'
+import { useProfiles } from '@/features/instance-manager'
 import { HeroSection } from './hero-section'
 import { NewsFeed } from './news-feed'
 import { ModsPanel } from './mods-panel'
