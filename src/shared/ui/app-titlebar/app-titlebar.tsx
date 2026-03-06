@@ -62,7 +62,7 @@ export function AppTitlebar() {
 
     const NAV_ITEMS = [
         { href: '/',          label: t('nav.home'),       icon: Home     },
-        { href: '/profiles',  label: t('nav.profiles'),   icon: Zap      },
+        { href: '/instances', label: t('nav.profiles'),   icon: Zap      },
         { href: '/catalog',   label: t('nav.catalog'),    icon: BookOpen },
         { href: '/settings',  label: t('nav.settings'),   icon: Settings },
     ]

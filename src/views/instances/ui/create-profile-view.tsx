@@ -71,7 +71,7 @@ export function CreateProfileView() {
         name: profileName.trim(),
         gameVersion: selectedVersion,
       })
-      router.push('/profiles')
+      router.push('/instances')
     } catch (err) {
       console.error('Failed to create profile:', err)
     } finally {
@@ -91,7 +91,7 @@ export function CreateProfileView() {
         <Button
           variant='ghost'
           size='sm'
-          onClick={() => router.push('/profiles')}
+          onClick={() => router.push('/instances')}
           className='h-8 w-8 p-0'
         >
           <ArrowLeft className='h-4 w-4' />
