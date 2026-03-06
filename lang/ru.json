@@ -130,7 +130,10 @@
     "gameDir": "Папка игры",
     "gameDirGlobal": "Общая (.minecraft)",
     "gameDirProfile": "Для каждого профиля",
-    "gameDirFamily": "Для семейства"
+    "gameDirFamily": "Для семейства",
+    "profileName": "Название профиля",
+    "profileNamePlaceholder": "Мой крутой модпак…",
+    "selectVersion": "Выберите версию для использования"
   },
   "common": {
     "item": "Пункт",

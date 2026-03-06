@@ -2,13 +2,24 @@
 
 import * as React from 'react'
 import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
 import type { MinecraftVersion } from '@/shared/types/minecraft'
+
+interface DownloadProgress {
+  version_id: string
+  stage: string
+  progress: number
+  total_bytes: number
+  downloaded_bytes: number
+}
 
 interface UseVersionsReturn {
   versions: MinecraftVersion[]
   installedVersions: string[]
   isLoading: boolean
   isDownloading: boolean
+  downloadingVersionId: string | null
+  downloadStage: string
   downloadProgress: number
   error: string | null
   fetchVersions: () => Promise<void>
@@ -17,7 +28,7 @@ interface UseVersionsReturn {
   listInstalled: () => Promise<void>
 }
 
-interface DownloadedVersion {
+interface RawVersion {
   id: string
   version: string
   type: string
@@ -32,20 +43,39 @@ export function useVersions(): UseVersionsReturn {
   const [installedVersions, setInstalledVersions] = React.useState<string[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [isDownloading, setIsDownloading] = React.useState(false)
+  const [downloadingVersionId, setDownloadingVersionId] = React.useState<string | null>(null)
+  const [downloadStage, setDownloadStage] = React.useState('')
   const [downloadProgress, setDownloadProgress] = React.useState(0)
   const [error, setError] = React.useState<string | null>(null)
+
+  // Listen for download progress events from Tauri
+  React.useEffect(() => {
+    let unlisten: (() => void) | undefined
+
+    listen<DownloadProgress>('download-progress', (event) => {
+      const { stage, progress } = event.payload
+      setDownloadStage(stage)
+      setDownloadProgress(progress)
+    }).then((fn) => {
+      unlisten = fn
+    }).catch(() => {
+      // Not in Tauri environment
+    })
+
+    return () => { unlisten?.() }
+  }, [])
 
   const fetchVersions = React.useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const result = await invoke<DownloadedVersion[]>('fetch_minecraft_versions')
+      const result = await invoke<RawVersion[]>('fetch_minecraft_versions')
 
       const mapped: MinecraftVersion[] = result.map((v) => ({
         id: v.id,
         version: v.version,
-        type: v.type as 'release' | 'snapshot' | 'old_alpha' | 'old_beta',
+        type: v.type as MinecraftVersion['type'],
         releaseTime: new Date(v.releaseTime).getTime(),
         installed: v.installed,
         url: v.url,
@@ -66,7 +96,9 @@ export function useVersions(): UseVersionsReturn {
     async (versionId: string, versionUrl: string) => {
       try {
         setIsDownloading(true)
+        setDownloadingVersionId(versionId)
         setDownloadProgress(0)
+        setDownloadStage('metadata')
         setError(null)
 
         await invoke('download_minecraft_version', {
@@ -74,22 +106,21 @@ export function useVersions(): UseVersionsReturn {
           versionUrl,
         })
 
-        setDownloadProgress(100)
-
-        // Update versions list
+        // Mark as installed in local state
         setVersions((prev) =>
           prev.map((v) => (v.id === versionId ? { ...v, installed: true } : v)),
         )
 
-        // Refresh installed list
         await listInstalled()
-
-        setTimeout(() => setIsDownloading(false), 1000)
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
         setError(message)
-        setIsDownloading(false)
         console.error('Download failed:', message)
+      } finally {
+        setIsDownloading(false)
+        setDownloadingVersionId(null)
+        setDownloadStage('')
+        setDownloadProgress(0)
       }
     },
     [],
@@ -125,6 +156,8 @@ export function useVersions(): UseVersionsReturn {
     installedVersions,
     isLoading,
     isDownloading,
+    downloadingVersionId,
+    downloadStage,
     downloadProgress,
     error,
     fetchVersions,

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Settings, Home, LayoutGrid, BookOpen, Zap } from 'lucide-react'
+import { Settings, Home, BookOpen, Zap } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { useTranslation } from '@/shared/lib/i18n'
 
@@ -61,10 +61,10 @@ export function AppTitlebar() {
     const winRef = React.useRef<Awaited<ReturnType<typeof getWindow>> | null>(null)
 
     const NAV_ITEMS = [
-        { href: '/',          label: t('nav.home'),       icon: Home       },
-        { href: '/profiles',  label: t('nav.profiles'),   icon: Zap        },
-        { href: '/catalog',   label: t('nav.catalog'),    icon: BookOpen   },
-        { href: '/settings',  label: t('nav.settings'),   icon: Settings   },
+        { href: '/',          label: t('nav.home'),       icon: Home     },
+        { href: '/profiles',  label: t('nav.profiles'),   icon: Zap      },
+        { href: '/catalog',   label: t('nav.catalog'),    icon: BookOpen },
+        { href: '/settings',  label: t('nav.settings'),   icon: Settings },
     ]
 
     React.useEffect(() => {
@@ -85,72 +85,62 @@ export function AppTitlebar() {
     return (
         <header
             className='fixed top-0 left-0 right-0 z-[9999] h-9 flex items-stretch
-                       bg-sidebar border-b border-border select-none'
+                       bg-background/80 backdrop-blur-xl select-none'
             style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
-            {/* ── Navigation tabs ── */}
-            <nav
-                className='flex items-stretch gap-0.5 px-2'
-                style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            >
-                {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-                    <Link
-                        key={href}
-                        href={href}
-                        className={cn(
-                            'flex items-center gap-1.5 px-3 h-full text-xs font-medium transition-colors',
-                            pathname === href
-                                ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                                : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',
-                        )}
-                    >
-                        <Icon className='h-3.5 w-3.5 opacity-70' />
-                        <span className='hidden sm:inline'>{label}</span>
-                    </Link>
-                ))}
-            </nav>
+            {/* ── Left drag region ── */}
+            <div className='w-11 shrink-0' data-tauri-drag-region />
 
-            {/* ── Drag region + title ── */}
-            <div
-                className='flex flex-1 items-center px-2 min-w-0'
-                data-tauri-drag-region
-            >
-                <span className='text-sm font-medium text-sidebar-foreground/60 truncate pointer-events-none'>
-                    Nero Launcher
-                </span>
+            {/* ── Centered navigation ── */}
+            <div className='flex-1 flex items-stretch justify-center'>
+                <nav
+                    className='flex items-stretch gap-0.5'
+                    style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+                >
+                    {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={cn(
+                                'flex items-center gap-1.5 px-3.5 h-full text-xs font-medium transition-all rounded-md my-1',
+                                pathname === href
+                                    ? 'bg-foreground/8 text-foreground'
+                                    : 'text-foreground/50 hover:text-foreground/80 hover:bg-foreground/5',
+                            )}
+                        >
+                            <Icon className='h-3.5 w-3.5' />
+                            <span>{label}</span>
+                        </Link>
+                    ))}
+                </nav>
             </div>
 
             {/* ── Window controls ── */}
             <div
-                className='flex items-stretch'
+                className='flex items-stretch shrink-0'
                 style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
             >
-                {/* Minimize */}
                 <button
                     onClick={handleMinimize}
                     aria-label='Minimize'
-                    className='flex w-11 items-center justify-center text-sidebar-foreground/60
-                               hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors'
+                    className='flex w-11 items-center justify-center text-foreground/40
+                               hover:text-foreground hover:bg-foreground/8 transition-colors'
                 >
                     <IconMinimize />
                 </button>
-
-                {/* Maximize / Restore */}
                 <button
                     onClick={handleToggleMax}
                     aria-label={isMaximized ? 'Restore' : 'Maximize'}
-                    className='flex w-11 items-center justify-center text-sidebar-foreground/60
-                               hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors'
+                    className='flex w-11 items-center justify-center text-foreground/40
+                               hover:text-foreground hover:bg-foreground/8 transition-colors'
                 >
                     {isMaximized ? <IconRestore /> : <IconMaximize />}
                 </button>
-
-                {/* Close */}
                 <button
                     onClick={handleClose}
                     aria-label='Close'
-                    className='flex w-11 items-center justify-center text-sidebar-foreground/60
-                               hover:text-white hover:bg-destructive transition-colors rounded-none'
+                    className='flex w-11 items-center justify-center text-foreground/40
+                               hover:text-white hover:bg-destructive transition-colors'
                 >
                     <IconClose />
                 </button>

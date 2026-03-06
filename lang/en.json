@@ -130,7 +130,10 @@
     "gameDir": "Game Directory",
     "gameDirGlobal": "Global (.minecraft)",
     "gameDirProfile": "Per-Profile",
-    "gameDirFamily": "Per-Family"
+    "gameDirFamily": "Per-Family",
+    "profileName": "Profile Name",
+    "profileNamePlaceholder": "My awesome modpack…",
+    "selectVersion": "Select a version to use"
   },
   "common": {
     "item": "Item",
