@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { Clock, Package, Folder, Settings, Plus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { PROFILES, type Profile } from '../model/mock-data'
+import { useProfiles } from '@/features/profile-manager'
+import type { Profile } from '@/entities/profile'
 
 function StatBadge({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
     return (
@@ -15,7 +16,7 @@ function StatBadge({ icon: Icon, label, value }: { icon: React.ElementType; labe
     )
 }
 
-function ProfileCard({
+function ProfileCardItem({
     profile,
     isActive,
     onClick,
@@ -28,17 +29,16 @@ function ProfileCard({
         <button
             onClick={onClick}
             className={cn(
-                'w-full flex items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 border',
+                'w-full flex items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 border text-sm',
                 isActive
-                    ? 'bg-primary/10 border-primary/40 text-primary'
-                    : 'bg-card border-border hover:bg-accent/50 hover:border-border text-card-foreground',
+                    ? 'bg-primary/10 border-primary/40'
+                    : 'bg-card border-border hover:bg-accent/50 hover:border-border',
             )}
         >
-            <span className='text-2xl leading-none'>{profile.icon}</span>
             <div className='flex-1 min-w-0'>
-                <p className='text-sm font-semibold truncate'>{profile.name}</p>
+                <p className='font-semibold truncate'>{profile.name}</p>
                 <p className='text-xs text-muted-foreground mt-0.5'>
-                    {profile.version} · {profile.modLoader}
+                    {profile.gameVersion}
                 </p>
             </div>
             {isActive && (
@@ -55,6 +55,13 @@ export function ProfileSidebar({
     activeProfileId: string
     onSelectProfile: (id: string) => void
 }) {
+    const { profiles, isLoading } = useProfiles()
+    const [showNewForm, setShowNewForm] = React.useState(false)
+    const [newName, setNewName] = React.useState('')
+
+    const totalPlaytime = profiles.reduce((sum, p) => sum + p.playtime, 0)
+    const hours = Math.floor(totalPlaytime / 3600)
+
     return (
         <aside className='w-64 shrink-0 flex flex-col border-r border-border bg-sidebar overflow-hidden'>
             {/* User header */}
@@ -65,7 +72,7 @@ export function ProfileSidebar({
                     </div>
                     <div className='min-w-0'>
                         <p className='text-sm font-semibold truncate'>Steve</p>
-                        <p className='text-xs text-muted-foreground'>Лицензионный аккаунт</p>
+                        <p className='text-xs text-muted-foreground'>Licensed Account</p>
                     </div>
                     <button className='ml-auto p-1.5 rounded-lg hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-foreground'>
                         <Settings className='h-3.5 w-3.5' />
@@ -76,28 +83,43 @@ export function ProfileSidebar({
             {/* Profiles list */}
             <div className='flex-1 overflow-y-auto p-3 space-y-1.5'>
                 <p className='text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-2'>
-                    Профили
+                    Profiles
                 </p>
-                {PROFILES.map((p) => (
-                    <ProfileCard
-                        key={p.id}
-                        profile={p}
-                        isActive={p.id === activeProfileId}
-                        onClick={() => onSelectProfile(p.id)}
-                    />
-                ))}
+
+                {isLoading ? (
+                    <div className='space-y-1.5'>
+                        {[1, 2].map((i) => (
+                            <div
+                                key={i}
+                                className='h-16 animate-pulse rounded-xl bg-muted/30'
+                            />
+                        ))}
+                    </div>
+                ) : profiles.length === 0 ? (
+                    <p className='text-xs text-muted-foreground px-1'>No profiles</p>
+                ) : (
+                    profiles.map((p) => (
+                        <ProfileCardItem
+                            key={p.id}
+                            profile={p}
+                            isActive={p.id === activeProfileId}
+                            onClick={() => onSelectProfile(p.id)}
+                        />
+                    ))
+                )}
+
                 <button className='w-full flex items-center gap-2 rounded-xl p-3 text-sm text-muted-foreground border border-dashed border-border hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200'>
                     <Plus className='h-4 w-4' />
-                    Новый профиль
+                    New Profile
                 </button>
             </div>
 
             {/* Quick stats */}
             <div className='p-3 border-t border-border'>
                 <div className='grid grid-cols-3 gap-1.5'>
-                    <StatBadge icon={Clock}    label='Часов'  value='142' />
-                    <StatBadge icon={Package}  label='Модов'  value='37'  />
-                    <StatBadge icon={Folder}   label='Миров'  value='8'   />
+                    <StatBadge icon={Clock} label='Hours' value={hours.toString()} />
+                    <StatBadge icon={Package} label='Profiles' value={profiles.length.toString()} />
+                    <StatBadge icon={Folder} label='Versions' value={new Set(profiles.map(p => p.gameVersion)).size.toString()} />
                 </div>
             </div>
         </aside>

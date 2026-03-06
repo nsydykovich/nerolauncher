@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { Play, ChevronDown, Clock, RefreshCw, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { PROFILES, type Profile } from '../model/mock-data'
+import { useProfiles } from '@/features/profile-manager'
+import type { Profile } from '@/entities/profile'
 
 export function HeroSection({
     activeProfile,
@@ -18,6 +19,7 @@ export function HeroSection({
     onPlay: () => void
     onSelectProfile: (id: string) => void
 }) {
+    const { profiles } = useProfiles()
     const [profileDropdownOpen, setProfileDropdownOpen] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
 
@@ -42,19 +44,21 @@ export function HeroSection({
                 {/* Profile info */}
                 <div className='flex-1 min-w-0'>
                     <div className='flex items-center gap-3 mb-1'>
-                        <span className='text-4xl'>{activeProfile.icon}</span>
+                        <div className='h-16 w-16 rounded-xl bg-primary/20 flex items-center justify-center shrink-0'>
+                            <span className='text-3xl'>🎮</span>
+                        </div>
                         <div>
                             <h1 className='text-2xl font-bold tracking-tight'>{activeProfile.name}</h1>
                             <div className='flex items-center gap-2 mt-0.5'>
                                 <span className='text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium'>
-                                    {activeProfile.version}
+                                    {activeProfile.gameVersion}
                                 </span>
                                 <span className='text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium'>
                                     {activeProfile.modLoader}
                                 </span>
                                 <span className='text-xs text-muted-foreground flex items-center gap-1'>
                                     <Clock className='h-3 w-3' />
-                                    {activeProfile.lastPlayed}
+                                    {activeProfile.lastPlayed ? new Date(activeProfile.lastPlayed * 1000).toLocaleDateString() : 'Never'}
                                 </span>
                             </div>
                         </div>
@@ -81,7 +85,7 @@ export function HeroSection({
                         </button>
                         {profileDropdownOpen && (
                             <div className='absolute right-0 top-full mt-1 w-56 rounded-xl border border-border bg-popover shadow-xl py-1 z-50'>
-                                {PROFILES.map((p) => (
+                                {profiles.map((p) => (
                                     <button
                                         key={p.id}
                                         onClick={() => { onSelectProfile(p.id); setProfileDropdownOpen(false) }}
@@ -92,7 +96,7 @@ export function HeroSection({
                                                 : 'text-popover-foreground hover:bg-accent',
                                         )}
                                     >
-                                        <span>{p.icon}</span>
+                                        <span className='h-5 w-5 rounded-lg bg-primary/20 flex items-center justify-center shrink-0'>🎮</span>
                                         <span className='truncate'>{p.name}</span>
                                     </button>
                                 ))}
