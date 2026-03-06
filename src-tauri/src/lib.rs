@@ -57,6 +57,8 @@ pub fn run() {
             commands::profiles::delete_profile,
             commands::profiles::update_last_played,
             commands::profiles::add_playtime,
+            commands::launcher::launch_game,
+            commands::launcher::get_game_dir,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

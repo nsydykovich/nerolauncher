@@ -4,13 +4,14 @@ import * as React from 'react'
 import { Play, ChevronDown, Clock, RefreshCw, Settings } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { useProfiles } from '@/features/profile-manager'
+import { useLauncher } from '@/features/game-launcher'
 import type { Profile } from '@/entities/profile'
 
 export function HeroSection({
     activeProfile,
     activeProfileId,
-    isLaunching,
-    onPlay,
+    isLaunching: externalIsLaunching,
+    onPlay: externalOnPlay,
     onSelectProfile,
 }: {
     activeProfile: Profile
@@ -20,8 +21,22 @@ export function HeroSection({
     onSelectProfile: (id: string) => void
 }) {
     const { profiles } = useProfiles()
+    const { isLaunching: launcherIsLaunching, launch } = useLauncher()
     const [profileDropdownOpen, setProfileDropdownOpen] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
+
+    const isLaunching = externalIsLaunching || launcherIsLaunching
+
+    const handlePlay = async () => {
+        externalOnPlay()
+        await launch({
+            profileId: activeProfileId,
+            gameVersion: activeProfile.gameVersion,
+            javaVersion: activeProfile.javaVersion,
+            gameDirStrategy: 'per-profile', // TODO: get from settings
+            javaArgs: activeProfile.javaArgs,
+        })
+    }
 
     React.useEffect(() => {
         if (!profileDropdownOpen) return
@@ -106,7 +121,7 @@ export function HeroSection({
 
                     {/* Play button */}
                     <button
-                        onClick={onPlay}
+                        onClick={handlePlay}
                         disabled={isLaunching}
                         className={cn(
                             'flex items-center gap-2 h-11 px-6 rounded-r-xl font-semibold text-sm transition-all duration-200',
@@ -119,12 +134,12 @@ export function HeroSection({
                         {isLaunching ? (
                             <>
                                 <RefreshCw className='h-4 w-4 animate-spin' />
-                                Запуск...
+                                Launching...
                             </>
                         ) : (
                             <>
                                 <Play className='h-4 w-4 fill-current' />
-                                Играть
+                                Play
                             </>
                         )}
                     </button>

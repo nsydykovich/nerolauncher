@@ -1,16 +1,16 @@
 import { cva } from 'class-variance-authority'
 
 export const buttonVariants = cva(
-    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-base,0.5rem)] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-base,0.5rem)] text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95',
     {
         variants: {
             variant: {
-                default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-                primary: 'bg-[var(--accent-color,theme(colors.blue.600))] text-white hover:opacity-90',
-                secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-                ghost: 'hover:bg-accent hover:text-accent-foreground',
-                destructive: 'bg-destructive text-white hover:bg-destructive/90',
-                outline: 'border border-border bg-transparent hover:bg-accent hover:text-accent-foreground',
+                default: 'bg-primary text-primary-foreground hover:bg-primary/80 hover:shadow-md dark:hover:bg-primary/70',
+                primary: 'bg-[var(--accent-color,theme(colors.blue.600))] text-white hover:opacity-90 hover:shadow-lg active:opacity-80',
+                secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/70 hover:shadow-sm dark:hover:bg-secondary/60',
+                ghost: 'text-foreground hover:bg-accent/80 hover:text-accent-foreground dark:hover:bg-accent/40',
+                destructive: 'bg-destructive text-white hover:bg-destructive/80 hover:shadow-md dark:hover:bg-destructive/70',
+                outline: 'border border-border bg-transparent text-foreground hover:bg-accent/40 hover:border-accent/50 dark:hover:bg-accent/20',
             },
             size: {
                 sm: 'h-[var(--btn-h-sm,2rem)] px-[var(--btn-px-sm,0.75rem)] text-xs',
