@@ -64,15 +64,15 @@ export function useLauncher(): UseLauncherReturn {
 
       // Now launch the game with auth
       const launchArgs = {
-        profile_id: options.profileId,
-        game_version: options.gameVersion,
-        java_version: options.javaVersion,
-        game_dir_strategy: options.gameDirStrategy,
+        profileId: options.profileId,
+        gameVersion: options.gameVersion,
+        javaVersion: options.javaVersion,
+        gameDirStrategy: options.gameDirStrategy,
         username: options.username,
         uuid: options.uuid,
-        access_token: options.accessToken,
-        java_args: options.javaArgs,
-        extra_args: options.extraArgs,
+        accessToken: options.accessToken,
+        javaArgs: options.javaArgs,
+        extraArgs: options.extraArgs,
       }
       console.log('Launching game with args:', launchArgs)
       const launchPid = await invoke<number>('launch_game', launchArgs)
@@ -96,7 +96,7 @@ export function useLauncher(): UseLauncherReturn {
     async (profileId: string, strategy: GameDirStrategy): Promise<string> => {
       try {
         return await invoke<string>('get_game_dir', {
-          profile_id: profileId,
+          profileId: profileId,
           strategy,
         })
       } catch (err) {

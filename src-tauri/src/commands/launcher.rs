@@ -17,27 +17,6 @@ pub enum GameDirStrategy {
     PerFamily,
 }
 
-/// Launch game parameters struct for Tauri serialization
-#[derive(Debug, serde::Deserialize)]
-pub struct LaunchGameParams {
-    #[serde(alias = "profileId")]
-    pub profile_id: String,
-    #[serde(alias = "gameVersion")]
-    pub game_version: String,
-    #[serde(alias = "javaVersion")]
-    pub java_version: u8,
-    #[serde(alias = "gameDirStrategy")]
-    pub game_dir_strategy: String,
-    #[serde(alias = "javaArgs")]
-    pub java_args: Option<String>,
-    #[serde(alias = "extraArgs")]
-    pub extra_args: Option<String>,
-    pub username: String,
-    pub uuid: String,
-    #[serde(alias = "accessToken")]
-    pub access_token: String,
-}
-
 /// Resolve game directory based on strategy
 pub fn resolve_game_dir(
     strategy: GameDirStrategy,
@@ -164,11 +143,19 @@ fn get_natives_dir(game_version: &str) -> Result<PathBuf, String> {
 /// Returns PID of the launched process
 #[tauri::command]
 pub fn launch_game(
-    params: LaunchGameParams,
+    profile_id: String,
+    game_version: String,
+    java_version: u8,
+    game_dir_strategy: String,
+    username: String,
+    uuid: String,
+    access_token: String,
+    java_args: Option<String>,
+    extra_args: Option<String>,
     db: State<DbState>,
 ) -> Result<u32, String> {
     // Parse strategy
-    let strategy = match params.game_dir_strategy.as_str() {
+    let strategy = match game_dir_strategy.as_str() {
         "global" => GameDirStrategy::Global,
         "per-profile" => GameDirStrategy::PerProfile,
         "per-family" => GameDirStrategy::PerFamily,
@@ -176,7 +163,7 @@ pub fn launch_game(
     };
 
     // Resolve game directory
-    let game_dir = resolve_game_dir(strategy, &params.profile_id, None);
+    let game_dir = resolve_game_dir(strategy, &profile_id, None);
 
     // Ensure game directory exists
     std::fs::create_dir_all(&game_dir).map_err(|e| e.to_string())?;
@@ -185,10 +172,10 @@ pub fn launch_game(
         .ok_or("Could not determine home directory")?;
 
     let assets_dir = home.join(".nerolauncher").join("assets");
-    let version_dir = home.join(".nerolauncher").join("versions").join(&params.game_version);
+    let version_dir = home.join(".nerolauncher").join("versions").join(&game_version);
 
     // Get asset index ID from version.json
-    let version_json_path = version_dir.join(format!("{}.json", &params.game_version));
+    let version_json_path = version_dir.join(format!("{}.json", &game_version));
     let version_json_str = std::fs::read_to_string(&version_json_path)
         .map_err(|e| format!("Failed to read version.json: {}", e))?;
 
@@ -204,7 +191,7 @@ pub fn launch_game(
     // Get Java path from database
     let java_path = {
         let conn = db.0.lock().map_err(|e| e.to_string())?;
-        let java_version_str = params.java_version.to_string();
+        let java_version_str = java_version.to_string();
         let setting_key = format!("java_path_{}", java_version_str);
 
         crate::db::settings::get_setting(&conn, &setting_key)
@@ -213,18 +200,18 @@ pub fn launch_game(
     };
 
     // Build classpath
-    let classpath = build_classpath(&params.game_version)?;
+    let classpath = build_classpath(&game_version)?;
 
     // Get natives directory
-    let natives_dir = get_natives_dir(&params.game_version)?;
+    let natives_dir = get_natives_dir(&game_version)?;
     std::fs::create_dir_all(&natives_dir).map_err(|e| e.to_string())?;
 
     // Build JVM command
     let mut cmd = Command::new(&java_path);
 
     // Add memory settings
-    let has_xmx = params.java_args.as_ref().map(|a| a.contains("-Xmx")).unwrap_or(false);
-    let has_xms = params.java_args.as_ref().map(|a| a.contains("-Xms")).unwrap_or(false);
+    let has_xmx = java_args.as_ref().map(|a| a.contains("-Xmx")).unwrap_or(false);
+    let has_xms = java_args.as_ref().map(|a| a.contains("-Xms")).unwrap_or(false);
 
     if !has_xmx {
         cmd.arg("-Xmx2048M");
@@ -234,7 +221,7 @@ pub fn launch_game(
     }
 
     // Add custom Java arguments if provided
-    if let Some(args) = &params.java_args {
+    if let Some(args) = &java_args {
         for arg in args.split_whitespace() {
             cmd.arg(arg);
         }
@@ -252,19 +239,19 @@ pub fn launch_game(
     cmd.arg("net.minecraft.client.main.Main");
 
     // Game arguments
-    cmd.arg("--username").arg(&params.username);
-    cmd.arg("--uuid").arg(&params.uuid);
-    cmd.arg("--accessToken").arg(&params.access_token);
+    cmd.arg("--username").arg(&username);
+    cmd.arg("--uuid").arg(&uuid);
+    cmd.arg("--accessToken").arg(&access_token);
     cmd.arg("--userType").arg("msa");
     cmd.arg("--versionType").arg("release");
-    cmd.arg("--version").arg(&params.game_version);
+    cmd.arg("--version").arg(&game_version);
     cmd.arg("--gameDir").arg(&game_dir);
     cmd.arg("--assetsDir").arg(assets_dir.to_string_lossy().to_string());
     cmd.arg("--assetIndex").arg(asset_index);
     cmd.arg("--nativesDirectory").arg(natives_path);
 
     // Add extra arguments if provided
-    if let Some(extra) = &params.extra_args {
+    if let Some(extra) = &extra_args {
         for arg in extra.split_whitespace() {
             cmd.arg(arg);
         }
@@ -276,31 +263,24 @@ pub fn launch_game(
     // Update profile's last played time
     {
         let conn = db.0.lock().map_err(|e| e.to_string())?;
-        let _ = crate::db::instances::update_last_played(&conn, &params.profile_id);
+        let _ = crate::db::instances::update_last_played(&conn, &profile_id);
     }
 
     Ok(child.id())
 }
 
-/// Get game dir params
-#[derive(Debug, serde::Deserialize)]
-pub struct GetGameDirParams {
-    #[serde(alias = "profileId")]
-    pub profile_id: String,
-    pub strategy: String,
-}
-
 /// Get resolved game directory for a profile
 #[tauri::command]
 pub fn get_game_dir(
-    params: GetGameDirParams,
+    profile_id: String,
+    strategy: String,
 ) -> Result<String, String> {
-    let strat = match params.strategy.as_str() {
+    let strat = match strategy.as_str() {
         "global" => GameDirStrategy::Global,
         "per-profile" => GameDirStrategy::PerProfile,
         "per-family" => GameDirStrategy::PerFamily,
         _ => GameDirStrategy::Global,
     };
 
-    Ok(resolve_game_dir(strat, &params.profile_id, None))
+    Ok(resolve_game_dir(strat, &profile_id, None))
 }
