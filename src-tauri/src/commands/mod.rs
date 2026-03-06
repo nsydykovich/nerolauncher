@@ -4,5 +4,6 @@ pub mod java;
 pub mod profiles;
 pub mod launcher;
 pub mod downloader;
+pub mod downloader_v2;
 pub mod news;
 pub mod verifier;

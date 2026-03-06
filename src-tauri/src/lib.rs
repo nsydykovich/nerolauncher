@@ -67,6 +67,9 @@ pub fn run() {
             commands::downloader::is_version_installed,
             commands::downloader::delete_version,
             commands::downloader::list_installed_versions,
+            // PolyMC-style commands
+            commands::downloader_v2::download_assets_polymc,
+            commands::downloader_v2::download_libraries_polymc,
             commands::verifier::verify_version,
             commands::verifier::repair_version,
             commands::news::list_news,
