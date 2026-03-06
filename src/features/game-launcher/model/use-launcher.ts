@@ -34,18 +34,19 @@ export function useLauncher(): UseLauncherReturn {
       setIsLaunching(true)
       setError(null)
 
-      // First, download assets and libraries (optional, don't block)
+      // Download resources using PolyMC-style downloader (with SHA1 verification)
       try {
-        await invoke('download_assets', {
+        console.log('Downloading assets with SHA1 verification...')
+        await invoke('download_assets_polymc', {
           version_id: options.gameVersion,
-          asset_index_id: options.gameVersion,
         })
       } catch (e) {
         console.warn('Asset download warning:', e)
       }
 
       try {
-        await invoke('download_libraries', {
+        console.log('Downloading libraries with SHA1 verification...')
+        await invoke('download_libraries_polymc', {
           version_id: options.gameVersion,
         })
       } catch (e) {
@@ -53,6 +54,7 @@ export function useLauncher(): UseLauncherReturn {
       }
 
       try {
+        console.log('Downloading natives...')
         await invoke('download_natives', {
           version_id: options.gameVersion,
         })
