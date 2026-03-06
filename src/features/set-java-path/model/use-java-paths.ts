@@ -4,75 +4,76 @@ import * as React from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import {
   JAVA_VERSION_NUMBERS,
-  JAVA_ACTIVE_VERSION_KEY,
   versionToSettingKey,
+  versionToSourceKey,
+  versionToArgsPresetKey,
+  versionToCustomArgsKey,
+  versionToExtraArgsKey,
   type JavaVersionNumber,
   type JavaVersion,
+  type JavaSourceType,
+  type JavaArgsPresetId,
 } from '@/entities/java-version'
 
 export function useJavaPaths() {
   const [versions, setVersions] = React.useState<JavaVersion[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
 
-  // Load all paths on mount
   React.useEffect(() => {
-    const loadPathsFromDb = async () => {
+    const load = async () => {
       try {
-        const allSettings = await invoke<Record<string, string>>('get_all_settings')
-
-        const loadedVersions: JavaVersion[] = JAVA_VERSION_NUMBERS.map((versionNum) => ({
-          javaVersion: versionNum,
-          javaPath: allSettings[versionToSettingKey(versionNum)] || '',
-          isActive: allSettings[JAVA_ACTIVE_VERSION_KEY] === String(versionNum),
-        }))
-
-        setVersions(loadedVersions)
-      } catch (error) {
-        console.error('Failed to load Java paths:', error)
+        const all = await invoke<Record<string, string>>('get_all_settings')
         setVersions(
-          JAVA_VERSION_NUMBERS.map((versionNum) => ({
-            javaVersion: versionNum,
+          JAVA_VERSION_NUMBERS.map((v) => ({
+            javaVersion: v,
+            javaPath: all[versionToSettingKey(v)] || '',
+            sourceType: (all[versionToSourceKey(v)] as JavaSourceType) || 'mojang',
+            argsPreset: (all[versionToArgsPresetKey(v)] as JavaArgsPresetId) || 'aikars',
+            customArgs: all[versionToCustomArgsKey(v)] || '',
+            extraArgs: all[versionToExtraArgsKey(v)] || '',
+          })),
+        )
+      } catch {
+        setVersions(
+          JAVA_VERSION_NUMBERS.map((v) => ({
+            javaVersion: v,
             javaPath: '',
-            isActive: false,
+            sourceType: 'mojang' as JavaSourceType,
+            argsPreset: 'aikars' as JavaArgsPresetId,
+            customArgs: '',
+            extraArgs: '',
           })),
         )
       } finally {
         setIsLoading(false)
       }
     }
-
-    loadPathsFromDb()
+    load()
   }, [])
 
   const setPath = async (version: JavaVersionNumber, path: string) => {
-    setVersions((prev) =>
-      prev.map((v) => (v.javaVersion === version ? { ...v, javaPath: path } : v)),
-    )
-    try {
-      await invoke('set_setting', {
-        key: versionToSettingKey(version),
-        value: path,
-      })
-    } catch (error) {
-      console.error(`Failed to save Java ${version} path:`, error)
-    }
+    setVersions((prev) => prev.map((v) => v.javaVersion === version ? { ...v, javaPath: path } : v))
+    try { await invoke('set_setting', { key: versionToSettingKey(version), value: path }) } catch {}
   }
 
-  const setActive = async (version: JavaVersionNumber) => {
-    setVersions((prev) =>
-      prev.map((v) => ({
-        ...v,
-        isActive: v.javaVersion === version,
-      })),
-    )
-    try {
-      await invoke('set_setting', {
-        key: JAVA_ACTIVE_VERSION_KEY,
-        value: String(version),
-      })
-    } catch (error) {
-      console.error(`Failed to set active Java version to ${version}:`, error)
-    }
+  const setSourceType = async (version: JavaVersionNumber, source: JavaSourceType) => {
+    setVersions((prev) => prev.map((v) => v.javaVersion === version ? { ...v, sourceType: source } : v))
+    try { await invoke('set_setting', { key: versionToSourceKey(version), value: source }) } catch {}
+  }
+
+  const setArgsPreset = async (version: JavaVersionNumber, preset: JavaArgsPresetId) => {
+    setVersions((prev) => prev.map((v) => v.javaVersion === version ? { ...v, argsPreset: preset } : v))
+    try { await invoke('set_setting', { key: versionToArgsPresetKey(version), value: preset }) } catch {}
+  }
+
+  const setCustomArgs = async (version: JavaVersionNumber, args: string) => {
+    setVersions((prev) => prev.map((v) => v.javaVersion === version ? { ...v, customArgs: args } : v))
+    try { await invoke('set_setting', { key: versionToCustomArgsKey(version), value: args }) } catch {}
+  }
+
+  const setExtraArgs = async (version: JavaVersionNumber, args: string) => {
+    setVersions((prev) => prev.map((v) => v.javaVersion === version ? { ...v, extraArgs: args } : v))
+    try { await invoke('set_setting', { key: versionToExtraArgsKey(version), value: args }) } catch {}
   }
 
   const browse = async (version: JavaVersionNumber) => {
@@ -81,25 +82,19 @@ export function useJavaPaths() {
       const selected = await open({
         multiple: false,
         directory: false,
-        filters: [
-          {
-            name: 'Java Executable',
-            extensions: ['exe', 'bin', 'cmd'],
-          },
-        ],
+        filters: [{ name: 'Java Executable', extensions: ['exe', 'bin', 'cmd'] }],
       })
-      if (typeof selected === 'string') {
-        await setPath(version, selected)
-      }
-    } catch (error) {
-      console.warn('Dialog plugin not available or cancelled:', error)
-    }
+      if (typeof selected === 'string') await setPath(version, selected)
+    } catch {}
   }
 
   return {
     versions,
     setPath,
-    setActive,
+    setSourceType,
+    setArgsPreset,
+    setCustomArgs,
+    setExtraArgs,
     browse,
     isLoading,
   }

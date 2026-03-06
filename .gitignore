@@ -46,3 +46,5 @@ yarn-error.log*
 next-env.d.ts
 .node-version
 certificates
+*storybook.log
+storybook-static

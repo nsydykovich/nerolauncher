@@ -5,10 +5,10 @@ export const windowTitleVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: 'bg-background text-foreground border-border/50 dark:bg-slate-900 dark:border-slate-700',
-				primary: 'bg-blue-500 text-white border-blue-600 dark:bg-blue-600 dark:border-blue-700',
-				secondary: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700',
-				glass: 'bg-background/40 backdrop-blur-md text-foreground border-border/30 dark:bg-slate-900/40 dark:border-slate-700/30'
+				default: 'bg-sidebar text-sidebar-foreground border-sidebar-border',
+				primary: 'bg-primary text-primary-foreground border-primary/80',
+				secondary: 'bg-secondary text-secondary-foreground border-border',
+				glass: 'bg-sidebar/60 backdrop-blur-md text-sidebar-foreground border-sidebar-border/50'
 			},
 			size: {
 				sm: 'min-h-8',
@@ -35,13 +35,13 @@ export const windowTitleButtonVariants = cva(
 		variants: {
 			variant: {
 				default:
-					'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:ring-slate-400',
+					'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent focus:ring-sidebar-ring',
 				danger:
-					'text-red-600 dark:text-red-400 hover:bg-red-500/20 dark:hover:bg-red-500/20 focus:ring-red-500',
+					'text-sidebar-foreground/70 hover:text-white hover:bg-destructive focus:ring-destructive',
 				minimize:
-					'text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 dark:hover:bg-amber-500/20 focus:ring-amber-500',
+					'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent focus:ring-sidebar-ring',
 				maximize:
-					'text-green-600 dark:text-green-400 hover:bg-green-500/20 dark:hover:bg-green-500/20 focus:ring-green-500'
+					'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent focus:ring-sidebar-ring'
 			},
 			size: {
 				sm: 'w-6 h-6 text-xs',

@@ -75,11 +75,21 @@
   },
   "java": {
     "title": "Java",
-    "description": "Настройте установки Java для запуска Minecraft.",
+    "description": "Выберите источник Java и аргументы JVM для каждой версии.",
     "pathPlaceholder": "Путь к исполняемому файлу java…",
     "browse": "Обзор",
     "active": "Активна",
-    "pathLabel": "Путь к исполняемому файлу"
+    "pathLabel": "Путь к исполняемому файлу",
+    "mojangLabel": "Java от Mojang",
+    "customLabel": "Своя Java",
+    "mojangDesc": "Автоматически загружается и управляется лаунчером.",
+    "argsLabel": "Аргументы JVM",
+    "argsPlaceholder": "-XX:+SomeFlag -Dsomething=value",
+    "argsHint": "Применяются по умолчанию, если в профиле не заданы свои аргументы.",
+    "extraArgsLabel": "Дополнительные аргументы",
+    "customWarning": "Не указывайте -Xms и -Xmx в кастомных аргументах — используйте глобальные слайдеры памяти.",
+    "globalTitle": "Глобальные настройки JVM",
+    "globalDescription": "Настройки памяти и GC по умолчанию для всех профилей, если не переопределены."
   },
   "minecraft": {
     "title": "Minecraft",

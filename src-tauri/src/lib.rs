@@ -3,6 +3,7 @@ use db::DbState;
 
 mod db;
 mod commands;
+mod models;
 mod tray;
 
 pub fn run() {
@@ -48,6 +49,14 @@ pub fn run() {
             commands::themes::save_custom_theme,
             commands::themes::delete_custom_theme,
             commands::themes::rename_custom_theme,
+            commands::java::get_java_args,
+            commands::profiles::create_profile,
+            commands::profiles::get_profile,
+            commands::profiles::list_profiles,
+            commands::profiles::update_profile,
+            commands::profiles::delete_profile,
+            commands::profiles::update_last_played,
+            commands::profiles::add_playtime,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

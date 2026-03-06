@@ -75,11 +75,21 @@
   },
   "java": {
     "title": "Java",
-    "description": "Configure Java installations for running Minecraft.",
+    "description": "Choose the Java source and per-version JVM arguments.",
     "pathPlaceholder": "Path to java executable…",
     "browse": "Browse",
     "active": "Active",
-    "pathLabel": "Executable path"
+    "pathLabel": "Executable path",
+    "mojangLabel": "Mojang Java",
+    "customLabel": "Custom Java",
+    "mojangDesc": "Automatically downloaded and managed by the launcher.",
+    "argsLabel": "JVM arguments",
+    "argsPlaceholder": "-XX:+SomeFlag -Dsomething=value",
+    "argsHint": "Applied by default when a profile has no custom args set.",
+    "extraArgsLabel": "Additional arguments",
+    "customWarning": "Do not include -Xms or -Xmx in custom arguments — use the global memory sliders instead.",
+    "globalTitle": "Global JVM Settings",
+    "globalDescription": "Default memory and GC settings applied to all profiles unless overridden."
   },
   "minecraft": {
     "title": "Minecraft",
