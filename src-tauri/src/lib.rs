@@ -59,6 +59,11 @@ pub fn run() {
             commands::profiles::add_playtime,
             commands::launcher::launch_game,
             commands::launcher::get_game_dir,
+            commands::downloader::fetch_minecraft_versions,
+            commands::downloader::download_minecraft_version,
+            commands::downloader::is_version_installed,
+            commands::downloader::delete_version,
+            commands::downloader::list_installed_versions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

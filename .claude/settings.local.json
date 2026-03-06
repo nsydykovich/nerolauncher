@@ -10,7 +10,8 @@
       "WebFetch(domain:docs.papermc.io)",
       "WebFetch(domain:kstefanj.github.io)",
       "WebFetch(domain:aikar.co)",
-      "WebFetch(domain:www.leafmc.one)"
+      "WebFetch(domain:www.leafmc.one)",
+      "Bash(cargo build:*)"
     ]
   },
   "outputStyle": "default",
