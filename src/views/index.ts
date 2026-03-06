@@ -1,3 +1,5 @@
 export * from './home'
+export * from './profiles'
+export * from './catalog'
 export * from './test'
 export * from './settings'

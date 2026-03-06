@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Settings, Home, LayoutGrid } from 'lucide-react'
+import { Settings, Home, LayoutGrid, BookOpen, Zap } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { useTranslation } from '@/shared/lib/i18n'
 
@@ -57,25 +57,15 @@ function IconClose() {
 export function AppTitlebar() {
     const pathname = usePathname()
     const { t } = useTranslation()
-    const [menuOpen, setMenuOpen] = React.useState(false)
     const [isMaximized, setIsMaximized] = React.useState(false)
-    const menuRef = React.useRef<HTMLDivElement>(null)
     const winRef = React.useRef<Awaited<ReturnType<typeof getWindow>> | null>(null)
 
     const NAV_ITEMS = [
         { href: '/',          label: t('nav.home'),       icon: Home       },
+        { href: '/profiles',  label: t('nav.profiles'),   icon: Zap        },
+        { href: '/catalog',   label: t('nav.catalog'),    icon: BookOpen   },
         { href: '/settings',  label: t('nav.settings'),   icon: Settings   },
-        { href: '/test',      label: t('nav.components'), icon: LayoutGrid },
     ]
-
-    React.useEffect(() => {
-        if (!menuOpen) return
-        const h = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
-        }
-        document.addEventListener('mousedown', h)
-        return () => document.removeEventListener('mousedown', h)
-    }, [menuOpen])
 
     React.useEffect(() => {
         let unlisten: (() => void) | undefined
@@ -98,46 +88,27 @@ export function AppTitlebar() {
                        bg-sidebar border-b border-border select-none'
             style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
-            {/* ── Hamburger ── */}
-            <div
-                ref={menuRef}
-                className='relative flex items-stretch'
+            {/* ── Navigation tabs ── */}
+            <nav
+                className='flex items-stretch gap-0.5 px-2'
                 style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
             >
-                <button
-                    onClick={() => setMenuOpen(v => !v)}
-                    aria-label='Menu'
-                    className='flex w-9 items-center justify-center text-sidebar-foreground/70
-                               hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors'
-                >
-                    {menuOpen
-                        ? <X className='h-[15px] w-[15px]' />
-                        : <Menu className='h-[15px] w-[15px]' />
-                    }
-                </button>
-
-                {menuOpen && (
-                    <div className='absolute top-full left-0 w-52 rounded-b-xl border border-sidebar-border
-                                    bg-sidebar shadow-xl py-1 z-[9999]'>
-                        {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-                            <Link
-                                key={href}
-                                href={href}
-                                onClick={() => setMenuOpen(false)}
-                                className={cn(
-                                    'flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
-                                    pathname === href
-                                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                                        : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                                )}
-                            >
-                                <Icon className='h-4 w-4 opacity-60 shrink-0' />
-                                {label}
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </div>
+                {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+                    <Link
+                        key={href}
+                        href={href}
+                        className={cn(
+                            'flex items-center gap-1.5 px-3 h-full text-xs font-medium transition-colors',
+                            pathname === href
+                                ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',
+                        )}
+                    >
+                        <Icon className='h-3.5 w-3.5 opacity-70' />
+                        <span className='hidden sm:inline'>{label}</span>
+                    </Link>
+                ))}
+            </nav>
 
             {/* ── Drag region + title ── */}
             <div

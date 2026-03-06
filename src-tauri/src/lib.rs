@@ -64,6 +64,11 @@ pub fn run() {
             commands::downloader::is_version_installed,
             commands::downloader::delete_version,
             commands::downloader::list_installed_versions,
+            commands::news::list_news,
+            commands::news::get_news,
+            commands::news::create_news,
+            commands::news::update_news,
+            commands::news::delete_news,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
