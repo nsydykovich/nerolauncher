@@ -5,6 +5,9 @@
 # Lapce
 .lapce
 
+# claude
+.claude
+
 # dependencies
 /node_modules
 /.pnp
