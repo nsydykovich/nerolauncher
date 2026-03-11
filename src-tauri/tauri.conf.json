@@ -2,10 +2,10 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Nero Launcher",
   "version": "0.1.0",
-  "identifier": "me.nerovim.nerolauncher.app",
+  "identifier": "me.nerovim.nerolauncher",
   "build": {
-    "beforeDevCommand": "yarn run dev",
-    "beforeBuildCommand": "yarn run build",
+    "beforeDevCommand": "pnpm run dev",
+    "beforeBuildCommand": "pnpm run build",
     "devUrl": "http://localhost:45545",
     "frontendDist": "../out"
   },

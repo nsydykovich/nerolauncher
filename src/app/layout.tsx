@@ -1,33 +1,33 @@
-import * as React from "react";
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { ThemeProvider } from "@/components/misc/theme-provider";
-import "@/styles/globals.css";
+import * as React from 'react';
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import { ThemeProvider } from '@/components/misc/theme-provider';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
-  title: "Nero Launcher",
-  description: "Unofficial Minecraft Launcher built with NextJS and Tauri",
+  title: 'Nero Launcher',
+  description: 'Unofficial Minecraft Launcher built with NextJS and Tauri',
 };
 
 const Lexend = localFont({
-  src: "../fonts/lexend/lexend.woff2",
-  variable: "--font-lexend",
+  src: '../fonts/lexend/lexend.woff2',
+  variable: '--font-lexend',
   preload: true,
-  display: "swap",
+  display: 'swap',
 });
 
 const GeistSans = localFont({
-  src: "../fonts/geist/geist-sans.woff2",
-  variable: "--font-geist-sans",
+  src: '../fonts/geist/geist-sans.woff2',
+  variable: '--font-geist-sans',
   preload: true,
-  display: "swap",
+  display: 'swap',
 });
 
 const GeistMono = localFont({
-  src: "../fonts/geist/geist-mono.woff2",
-  variable: "--font-geist-mono",
+  src: '../fonts/geist/geist-mono.woff2',
+  variable: '--font-geist-mono',
   preload: true,
-  display: "swap",
+  display: 'swap',
 });
 
 export default async function RootLayout({

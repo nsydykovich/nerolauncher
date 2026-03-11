@@ -1,0 +1,8 @@
+# Auto detect text files and normalize line endings to LF
+* text=auto eol=lf
+*.{js,jsx,ts,tsx,json,css,md,yml,yaml} text eol=lf
+*.exe binary
+*.wasm binary
+*.dll binary
+*.so binary
+*.dylib binary
