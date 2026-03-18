@@ -10,6 +10,10 @@ use commands::instances::{
     update_instance,
 };
 use commands::profile::{get_profile, set_profile};
+use commands::versions::{
+    fetch_fabric_versions, fetch_forge_versions, fetch_neoforge_versions, fetch_quilt_versions,
+    fetch_vanilla_versions,
+};
 use state::AppState;
 
 pub fn run() {
@@ -44,6 +48,11 @@ pub fn run() {
             get_app_data_dir,
             get_profile,
             set_profile,
+            fetch_vanilla_versions,
+            fetch_fabric_versions,
+            fetch_quilt_versions,
+            fetch_forge_versions,
+            fetch_neoforge_versions,
         ]);
 
     builder
