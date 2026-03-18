@@ -5,6 +5,10 @@ mod commands;
 mod models;
 mod state;
 
+use commands::instances::{
+    create_instance, delete_instance, get_app_data_dir, get_instance, list_instances,
+    update_instance,
+};
 use commands::profile::{get_profile, set_profile};
 use state::AppState;
 
@@ -32,6 +36,12 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            list_instances,
+            get_instance,
+            create_instance,
+            update_instance,
+            delete_instance,
+            get_app_data_dir,
             get_profile,
             set_profile,
         ]);
