@@ -1,8 +1,8 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import { ThemeProvider } from '@/components/misc/theme-provider';
-import '@/styles/globals.css';
+import { ThemeProvider } from '@/shared/ui/theme-provider';
+import '@/shared/styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Nero Launcher',
@@ -10,21 +10,21 @@ export const metadata: Metadata = {
 };
 
 const Lexend = localFont({
-  src: '../fonts/lexend/lexend.woff2',
+  src: '../shared/assets/lexend/lexend.woff2',
   variable: '--font-lexend',
   preload: true,
   display: 'swap',
 });
 
 const GeistSans = localFont({
-  src: '../fonts/geist/geist-sans.woff2',
+  src: '../shared/assets/geist/geist-sans.woff2',
   variable: '--font-geist-sans',
   preload: true,
   display: 'swap',
 });
 
 const GeistMono = localFont({
-  src: '../fonts/geist/geist-mono.woff2',
+  src: '../shared/assets/geist/geist-mono.woff2',
   variable: '--font-geist-mono',
   preload: true,
   display: 'swap',
