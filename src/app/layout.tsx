@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { ThemeProvider } from '@/shared/ui/theme-provider';
+import { Sidebar } from '@/widgets/navigation';
 import '@/shared/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -48,7 +49,10 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="flex h-screen overflow-hidden">
+            <Sidebar />
+            <main className="flex-1 overflow-hidden">{children}</main>
+          </div>
         </ThemeProvider>
       </body>
     </html>

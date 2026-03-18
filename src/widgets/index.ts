@@ -1,2 +1,3 @@
-// Widgets layer - complex UI components
-// This file will be populated as widgets are created
+export * from './instance-card';
+export * from './instance-grid';
+export * from './navigation';

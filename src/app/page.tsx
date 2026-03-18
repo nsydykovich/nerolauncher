@@ -1,23 +1,27 @@
 'use client';
-import React from 'react';
-import { motion } from 'motion/react';
-import { LampContainer } from '@/shared/ui/lamp';
+
+import Link from 'next/link';
+import { Layers, ArrowRight } from 'lucide-react';
+import { Button } from '@/shared/ui';
 
 export default function Page() {
   return (
-    <LampContainer>
-      <motion.h1
-        initial={{ opacity: 0.5, y: 100 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{
-          delay: 0.3,
-          duration: 0.8,
-          ease: 'easeInOut',
-        }}
-        className="mt-8 bg-linear-to-br from-slate-300 to-slate-500 bg-clip-text py-4 text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
-      >
-        Hey! <br /> If this looks unfinished, <br /> that's because it is!
-      </motion.h1>
-    </LampContainer>
+    <div className="flex h-full flex-col items-center justify-center gap-6 p-8">
+      <div className="text-center">
+        <h1 className="text-foreground text-4xl font-bold tracking-tight">
+          Welcome to Nero Launcher
+        </h1>
+        <p className="text-muted-foreground mt-3">
+          Your unofficial Minecraft launcher. Manage instances, mods, and more.
+        </p>
+      </div>
+      <Link href="/instances">
+        <Button className="gap-2">
+          <Layers className="h-4 w-4" />
+          Go to Instances
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </Link>
+    </div>
   );
 }
