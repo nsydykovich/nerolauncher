@@ -2,6 +2,8 @@ use tauri::Manager;
 use tauri_plugin_prevent_default::Flags;
 
 mod commands;
+mod java;
+mod launcher;
 mod models;
 mod state;
 
