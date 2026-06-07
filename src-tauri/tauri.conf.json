@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "identifier": "me.nerovim.nerolauncher",
   "build": {
-    "beforeDevCommand": "pnpm run dev",
-    "beforeBuildCommand": "pnpm run build",
+    "beforeDevCommand": "yarn run dev",
+    "beforeBuildCommand": "yarn run build",
     "devUrl": "http://localhost:45545",
     "frontendDist": "../out"
   },

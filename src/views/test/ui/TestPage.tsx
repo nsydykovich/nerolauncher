@@ -1,0 +1,23 @@
+'use client';
+import React from 'react';
+import { motion } from 'motion/react';
+import { LampContainer } from '@/shared/ui/lamp';
+
+export default function TestPage() {
+  return (
+    <LampContainer>
+      <motion.h1
+        initial={{ opacity: 0.5, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: 'easeInOut',
+        }}
+        className="mt-8 bg-linear-to-br from-slate-300 to-slate-500 bg-clip-text py-4 text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+      >
+        Hey! <br /> If this looks unfinished, <br /> that's because it is!
+      </motion.h1>
+    </LampContainer>
+  );
+}

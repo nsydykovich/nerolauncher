@@ -1,2 +1,4 @@
-// Views layer - page-level composite views
-// This file will be populated as views are created
+import TestPage from './test/ui/TestPage';
+import NotFound from './not-found/ui/NotFoundPage';
+
+export { TestPage, NotFound };

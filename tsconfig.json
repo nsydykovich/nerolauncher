@@ -23,12 +23,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@pages": ["./src/views"],
-      "@widgets": ["./src/widgets"],
-      "@features": ["./src/features"],
-      "@entities": ["./src/entities"],
-      "@shared": ["./src/shared"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -36,11 +31,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
   ],
   "exclude": [
     "node_modules",
     "src-tauri",
-    "aur"
   ]
 }
